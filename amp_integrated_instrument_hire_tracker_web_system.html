@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMP Instrument Hire Tracker & Web System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS Library for Instant Multi-Tab Excel (.xlsx) Downloads -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        .badge-green { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .badge-amber { background-color: #fef3c7; color: #b45309; border: 1px solid #fde047; }
+        .badge-blue { background-color: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .badge-red { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+        .badge-gray { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Brand Bar -->
+    <header class="bg-slate-900 text-white shadow-md border-b-4 border-blue-600">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+                    ACCESS MUSIC PROJECT (AMP)
+                </h1>
+                <p class="text-xs text-blue-300">Integrated Multi-Tab Instrument Hire & Asset Management System</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="exportToExcelWorkbook()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-sm transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Download Excel Workbook (.XLSX)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Excel Workbook Navigation Tabs -->
+    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-1 sm:space-x-2">
+            <button id="tab-btn-1" onclick="switchTab(1)" class="py-3 px-4 text-xs font-bold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-blue-600"></span> 1. Learner Qualification Roster
+            </button>
+            <button id="tab-btn-2" onclick="switchTab(2)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-slate-300"></span> 2. Instrument Asset Master
+            </button>
+            <button id="tab-btn-3" onclick="switchTab(3)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-slate-300"></span> 3. Active Hires Log
+            </button>
+            <button id="tab-btn-4" onclick="switchTab(4)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-slate-300"></span> 4. Executive PM Dashboard
+            </button>
+            <button id="tab-btn-5" onclick="switchTab(5)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 5. Web & Excel Deployment Guide
+            </button>
+        </div>
+    </nav>
+
+    <!-- Formula Link Banner -->
+    <div class="bg-blue-50 border-b border-blue-100 py-1.5 px-4 text-2xs text-blue-800 text-center font-medium">
+        🔗 Worksheets are linked: Updating loan transactions in Tab 3 automatically updates asset statuses in Tab 2 and updates calculations in Tab 4.
+    </div>
+
+    <!-- Content Body -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+
+        <!-- TAB 1: LEARNER QUALIFICATION ROSTER -->
+        <section id="tab-content-1" class="tab-page space-y-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Worksheet 1: Learner Qualification Roster</h2>
+                    <p class="text-xs text-slate-500">Evaluates 3 gate criteria. Formula rule: Status = <span class="text-green-700 font-semibold">QUALIFIED</span> when Test, Agreement, and Storage are all "Yes".</p>
+                </div>
+                <button onclick="addRowTab1()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition shadow-sm">+ Add Learner</button>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                        <thead class="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3 border-r border-slate-200">Learner ID</th>
+                                <th class="p-3 border-r border-slate-200">Full Name</th>
+                                <th class="p-3 border-r border-slate-200">Grade</th>
+                                <th class="p-3 border-r border-slate-200">Instrument Enrolled</th>
+                                <th class="p-3 border-r border-slate-200 text-center">Knowledge Test Passed?</th>
+                                <th class="p-3 border-r border-slate-200 text-center">Agreement Signed?</th>
+                                <th class="p-3 border-r border-slate-200 text-center">Safe Storage Verified?</th>
+                                <th class="p-3 text-center">Qualification Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-tab1">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: INSTRUMENT ASSET MASTER -->
+        <section id="tab-content-2" class="tab-page hidden space-y-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Worksheet 2: Instrument Asset Master Register</h2>
+                    <p class="text-xs text-slate-500">Inventory of physical instruments. Asset Status automatically syncs with Active Hire transactions in Worksheet 3.</p>
+                </div>
+                <button onclick="addRowTab2()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition shadow-sm">+ Register Asset</button>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                        <thead class="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3 border-r border-slate-200">AMP Asset ID</th>
+                                <th class="p-3 border-r border-slate-200">Category</th>
+                                <th class="p-3 border-r border-slate-200">Instrument Type</th>
+                                <th class="p-3 border-r border-slate-200">Brand / Serial No</th>
+                                <th class="p-3 border-r border-slate-200 text-center">Linked Asset Status</th>
+                                <th class="p-3 border-r border-slate-200">Storage Location</th>
+                                <th class="p-3 border-r border-slate-200">Damage Notes</th>
+                                <th class="p-3 text-right">Est. Repair Cost (R)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-tab2">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: ACTIVE HIRES LOG -->
+        <section id="tab-content-3" class="tab-page hidden space-y-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Worksheet 3: Active Hires & Loan Transaction Log</h2>
+                    <p class="text-xs text-slate-500">Cross-references qualified learners and assets. Overdue loans auto-flag red if today passes return due date.</p>
+                </div>
+                <button onclick="addRowTab3()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition shadow-sm">+ Log New Loan</button>
+            </div>
+
+            <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                        <thead class="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3 border-r border-slate-200">Txn ID</th>
+                                <th class="p-3 border-r border-slate-200">Learner Name (Ref: Wk1)</th>
+                                <th class="p-3 border-r border-slate-200">AMP Asset ID (Ref: Wk2)</th>
+                                <th class="p-3 border-r border-slate-200">Date Hired</th>
+                                <th class="p-3 border-r border-slate-200 text-center">Home Approved?</th>
+                                <th class="p-3 border-r border-slate-200">Return Due Date</th>
+                                <th class="p-3 border-r border-slate-200">Actual Return Date</th>
+                                <th class="p-3 text-center">Loan Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-tab3">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: PM EXECUTIVE DASHBOARD -->
+        <section id="tab-content-4" class="tab-page hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-center gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900">Worksheet 4: Executive PM Dashboard</h2>
+                    <p class="text-xs text-slate-500">Live formula aggregation linked dynamically across Worksheets 1, 2, and 3.</p>
+                </div>
+                <span class="text-2xs bg-blue-100 text-blue-800 font-bold px-2.5 py-1 rounded-full">Formula Summary View</span>
+            </div>
+
+            <!-- KPI Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-green-600">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Qualified Learners</span>
+                        <span class="text-2xs font-mono text-slate-400">=COUNTIF(Wk1)</span>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1" id="dash-qualified-count">0</div>
+                    <span class="text-xs text-slate-500" id="dash-qualified-rate">0% of total roster</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-blue-600">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Active Loans</span>
+                        <span class="text-2xs font-mono text-slate-400">=COUNTIF(Wk3)</span>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1" id="dash-active-count">0</div>
+                    <span class="text-xs text-slate-500" id="dash-home-count">0 Take-Home Approved</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-red-600">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Overdue Loans</span>
+                        <span class="text-2xs font-mono text-slate-400">=COUNTIF(Overdue)</span>
+                    </div>
+                    <div class="text-2xl font-bold text-red-600 mt-1" id="dash-overdue-count">0</div>
+                    <span class="text-xs text-red-500">Action required by staff</span>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-amber-500">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Repair Backlog Cost</span>
+                        <span class="text-2xs font-mono text-slate-400">=SUMIF(Wk2)</span>
+                    </div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1" id="dash-repair-cost">R 0.00</div>
+                    <span class="text-xs text-amber-700" id="dash-repair-count">0 assets currently in repair</span>
+                </div>
+            </div>
+
+            <!-- Formula Mapping Reference Table -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2">Excel Workbook Formula Mapping Table</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-50 font-bold border-b">
+                            <tr>
+                                <th class="p-2.5 border-r">Metric Name</th>
+                                <th class="p-2.5 border-r">Live Calculated Value</th>
+                                <th class="p-2.5">Linked Excel Formula Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y text-slate-700">
+                            <tr>
+                                <td class="p-2.5 border-r font-medium">Total Enrolled Learners</td>
+                                <td class="p-2.5 border-r font-bold" id="link-total-learners">0</td>
+                                <td class="p-2.5 font-mono text-blue-700">=COUNTA(Learner_Qualification!A2:A100)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border-r font-medium">Qualified Learners</td>
+                                <td class="p-2.5 border-r font-bold text-green-700" id="link-qual-learners">0</td>
+                                <td class="p-2.5 font-mono text-blue-700">=COUNTIF(Learner_Qualification!H2:H100, "QUALIFIED")</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border-r font-medium">Total Fleet Stock</td>
+                                <td class="p-2.5 border-r font-bold" id="link-total-assets">0</td>
+                                <td class="p-2.5 font-mono text-blue-700">=COUNTA(Instrument_Asset_Master!A2:A100)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border-r font-medium">Assets On Loan</td>
+                                <td class="p-2.5 border-r font-bold text-blue-700" id="link-loan-assets">0</td>
+                                <td class="p-2.5 font-mono text-blue-700">=COUNTIF(Instrument_Asset_Master!E2:E100, "On Hire")</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border-r font-medium">Assets In Repair Rack</td>
+                                <td class="p-2.5 border-r font-bold text-red-700" id="link-repair-assets">0</td>
+                                <td class="p-2.5 font-mono text-blue-700">=COUNTIF(Instrument_Asset_Master!E2:E100, "In Repair")</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 border-r font-medium">Total Repair Cost Overhead</td>
+                                <td class="p-2.5 border-r font-bold text-amber-700" id="link-repair-total">R 0.00</td>
+                                <td class="p-2.5 font-mono text-blue-700">=SUMIF(Instrument_Asset_Master!E2:E100, "In Repair", Instrument_Asset_Master!H2:H100)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: WEB & EXCEL DEPLOYMENT GUIDE -->
+        <section id="tab-content-5" class="tab-page hidden space-y-6">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
+                <h2 class="text-base font-bold text-slate-900">How to Assist AMP with Web Integration & Excel Usage</h2>
+                <p class="text-xs text-slate-500">Step-by-step roadmap for technical setup, cloud sharing, and operational training.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Step 1 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">1</div>
+                    <h3 class="text-sm font-bold text-slate-900">Option A: Web Portal Integration</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Host this HTML file directly on AMP's web server or upload it to <strong>GitHub Pages / Netlify</strong> (free hosting). 
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded-lg border text-2xs font-mono text-slate-700 space-y-1">
+                        <p class="font-bold text-slate-900">WordPress / Website Embed Code:</p>
+                        <code>&lt;iframe src="amp_tracker.html" width="100%" height="800px" style="border:none;"&gt;&lt;/iframe&gt;</code>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm">2</div>
+                    <h3 class="text-sm font-bold text-slate-900">Option B: Cloud Excel / Google Sheets</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Click the top green button to download <code>AMP_Integrated_Instrument_Hire_Tracker.xlsx</code>. Upload it to <strong>Google Drive</strong> or <strong>OneDrive</strong>.
+                    </p>
+                    <ul class="text-xs text-slate-600 space-y-1 list-disc pl-4">
+                        <li>Share edit link with admin staff (Nolufefe / Tutors).</li>
+                        <li>Dropdown menus and conditional colors transfer automatically into Google Sheets.</li>
+                    </ul>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
+                    <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 font-bold flex items-center justify-center text-sm">3</div>
+                    <h3 class="text-sm font-bold text-slate-900">Staff Operational Rules</h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Enforce 3 strict operational rules for tutors:
+                    </p>
+                    <ol class="text-xs text-slate-600 space-y-1.5 list-decimal pl-4">
+                        <li><strong>Gate Check:</strong> Never issue an instrument until Tab 1 shows <span class="badge-green px-1 rounded text-2xs">QUALIFIED</span>.</li>
+                        <li><strong>Immediate Check-In:</strong> Enter <code>Actual Return Date</code> in Tab 3 the moment an instrument returns.</li>
+                        <li><strong>Monthly Report:</strong> Export Tab 4 for PM Bridget Harrison's monthly operational review.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 text-center py-3 text-xs text-slate-500">
+        Access Music Project (AMP) — Integrated Excel Workbook System &copy; 2026
+    </footer>
+
+    <!-- Application Logic and SheetJS XLSX Engine -->
+    <script>
+        // Sample Linked Data Model
+        let dataTab1 = [
+            { id: "L001", name: "Sipho Ndlovu", grade: "Grade 10", inst: "Violin", test: "Yes", agreement: "Yes", storage: "Yes" },
+            { id: "L002", name: "Thandiwe Khumalo", grade: "Grade 11", inst: "Alto Saxophone", test: "Yes", agreement: "Yes", storage: "Yes" },
+            { id: "L003", name: "Buhle Mokoena", grade: "Grade 9", inst: "Cello", test: "Yes", agreement: "No", storage: "Yes" },
+            { id: "L004", name: "Lwandle Dlamini", grade: "Grade 12", inst: "Trumpet", test: "No", agreement: "No", storage: "No" },
+            { id: "L005", name: "Kamvalethu Botha", grade: "Grade 10", inst: "Bass Guitar", test: "Yes", agreement: "Yes", storage: "Yes" }
+        ];
+
+        let dataTab2 = [
+            { id: "AMP-VLNT-007", cat: "Strings", type: "Violin 4/4", brand: "Yamaha / SN771", status: "On Hire", loc: "Learner Home", damage: "None", cost: 0 },
+            { id: "AMP-ASX-011", cat: "Woodwind", type: "Alto Saxophone", brand: "Jupiter / SN332", status: "On Hire", loc: "Learner Home", damage: "None", cost: 0 },
+            { id: "AMP-VLCT-003", cat: "Strings", type: "Cello", brand: "Strunal / SN102", status: "Available", loc: "Shelf B1", damage: "None", cost: 0 },
+            { id: "AMP-TPT-013", cat: "Brass", type: "Trumpet", brand: "Bach / SN998", status: "In Repair", loc: "Repair Rack", damage: "Stuck Valve, dent on bell", cost: 450 },
+            { id: "AMP-BGS-003", cat: "Strings", type: "Bass Guitar", brand: "Ibanez / SN441", status: "On Hire", loc: "Learner Home", damage: "None", cost: 0 }
+        ];
+
+        let dataTab3 = [
+            { txn: "TXN-001", learner: "Sipho Ndlovu", asset: "AMP-VLNT-007", dateHired: "2026-02-01", home: "Yes", due: "2026-06-15", actual: "" },
+            { txn: "TXN-002", learner: "Thandiwe Khumalo", asset: "AMP-ASX-011", dateHired: "2026-02-03", home: "Yes", due: "2026-06-15", actual: "" },
+            { txn: "TXN-003", learner: "Kamvalethu Botha", asset: "AMP-BGS-003", dateHired: "2026-01-10", home: "Yes", due: "2026-03-01", actual: "" }
+        ];
+
+        let currentTab = 1;
+
+        // Sync Asset statuses in Tab 2 based on active hires in Tab 3
+        function syncWorksheets() {
+            dataTab2.forEach(asset => {
+                if (asset.status !== 'In Repair' && asset.status !== 'Decommissioned') {
+                    asset.status = 'Available';
+                }
+            });
+
+            dataTab3.forEach(loan => {
+                if (!loan.actual || loan.actual.trim() === '') {
+                    const matchedAsset = dataTab2.find(a => a.id === loan.asset);
+                    if (matchedAsset && matchedAsset.status !== 'In Repair') {
+                        matchedAsset.status = 'On Hire';
+                    }
+                }
+            });
+        }
+
+        function switchTab(tabNum) {
+            currentTab = tabNum;
+            document.querySelectorAll('.tab-page').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-content-${tabNum}`).classList.remove('hidden');
+
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`tab-btn-${i}`);
+                const dot = btn.querySelector('span');
+                if (i === tabNum) {
+                    btn.classList.add('border-blue-600', 'text-blue-600');
+                    btn.classList.remove('border-transparent', 'text-slate-500');
+                    if (dot) dot.className = "w-2 h-2 rounded-full bg-blue-600";
+                } else {
+                    btn.classList.remove('border-blue-600', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-slate-500');
+                    if (dot) dot.className = "w-2 h-2 rounded-full bg-slate-300";
+                }
+            }
+
+            if (tabNum === 4) updateDashboard();
+        }
+
+        // Render Worksheet 1
+        function renderTab1() {
+            const tbody = document.getElementById('tbody-tab1');
+            tbody.innerHTML = '';
+            dataTab1.forEach((row, index) => {
+                const isQualified = row.test === "Yes" && row.agreement === "Yes" && row.storage === "Yes";
+                const statusBadge = isQualified 
+                    ? `<span class="badge-green px-2.5 py-1 rounded-full font-bold text-xs">QUALIFIED</span>`
+                    : `<span class="badge-amber px-2.5 py-1 rounded-full font-bold text-xs">PENDING</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="p-3 border-r font-mono"><input value="${row.id}" onchange="dataTab1[${index}].id=this.value" class="w-full bg-transparent"></td>
+                        <td class="p-3 border-r"><input value="${row.name}" onchange="dataTab1[${index}].name=this.value" class="w-full font-semibold"></td>
+                        <td class="p-3 border-r"><input value="${row.grade}" onchange="dataTab1[${index}].grade=this.value" class="w-full"></td>
+                        <td class="p-3 border-r"><input value="${row.inst}" onchange="dataTab1[${index}].inst=this.value" class="w-full"></td>
+                        <td class="p-3 border-r text-center">
+                            <select onchange="dataTab1[${index}].test=this.value; renderTab1();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
+                                <option value="Yes" ${row.test === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${row.test === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3 border-r text-center">
+                            <select onchange="dataTab1[${index}].agreement=this.value; renderTab1();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
+                                <option value="Yes" ${row.agreement === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${row.agreement === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3 border-r text-center">
+                            <select onchange="dataTab1[${index}].storage=this.value; renderTab1();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
+                                <option value="Yes" ${row.storage === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${row.storage === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+            renderTab3();
+        }
+
+        // Render Worksheet 2
+        function renderTab2() {
+            syncWorksheets();
+            const tbody = document.getElementById('tbody-tab2');
+            tbody.innerHTML = '';
+            dataTab2.forEach((row, index) => {
+                let badgeClass = 'badge-gray';
+                if (row.status === 'Available') badgeClass = 'badge-green';
+                if (row.status === 'On Hire') badgeClass = 'badge-blue';
+                if (row.status === 'In Repair') badgeClass = 'badge-red';
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="p-3 border-r font-mono font-bold"><input value="${row.id}" onchange="dataTab2[${index}].id=this.value; renderTab3();" class="w-full bg-transparent"></td>
+                        <td class="p-3 border-r"><input value="${row.cat}" onchange="dataTab2[${index}].cat=this.value" class="w-full"></td>
+                        <td class="p-3 border-r"><input value="${row.type}" onchange="dataTab2[${index}].type=this.value" class="w-full"></td>
+                        <td class="p-3 border-r"><input value="${row.brand}" onchange="dataTab2[${index}].brand=this.value" class="w-full"></td>
+                        <td class="p-3 border-r text-center">
+                            <select onchange="dataTab2[${index}].status=this.value; renderTab2();" class="border rounded-md px-2 py-1 text-xs ${badgeClass} font-bold shadow-sm">
+                                <option value="Available" ${row.status === 'Available' ? 'selected' : ''}>Available</option>
+                                <option value="On Hire" ${row.status === 'On Hire' ? 'selected' : ''}>On Hire</option>
+                                <option value="In Repair" ${row.status === 'In Repair' ? 'selected' : ''}>In Repair</option>
+                                <option value="Decommissioned" ${row.status === 'Decommissioned' ? 'selected' : ''}>Decommissioned</option>
+                            </select>
+                        </td>
+                        <td class="p-3 border-r"><input value="${row.loc}" onchange="dataTab2[${index}].loc=this.value" class="w-full"></td>
+                        <td class="p-3 border-r"><input value="${row.damage}" onchange="dataTab2[${index}].damage=this.value" class="w-full"></td>
+                        <td class="p-3 text-right"><input type="number" value="${row.cost}" onchange="dataTab2[${index}].cost=parseFloat(this.value)||0; updateDashboard();" class="w-20 text-right bg-transparent border-b"></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Render Worksheet 3
+        function renderTab3() {
+            const tbody = document.getElementById('tbody-tab3');
+            tbody.innerHTML = '';
+            const today = new Date().toISOString().split('T')[0];
+
+            dataTab3.forEach((row, index) => {
+                let statusBadge = '';
+                if (row.actual && row.actual.trim() !== '') {
+                    statusBadge = `<span class="badge-green px-2.5 py-1 rounded-full font-bold text-xs">RETURNED</span>`;
+                } else if (row.due && row.due < today) {
+                    statusBadge = `<span class="badge-red px-2.5 py-1 rounded-full font-bold text-xs">OVERDUE</span>`;
+                } else {
+                    statusBadge = `<span class="badge-blue px-2.5 py-1 rounded-full font-bold text-xs">ACTIVE HIRE</span>`;
+                }
+
+                let learnerSelect = `<select onchange="dataTab3[${index}].learner=this.value" class="w-full border rounded-md p-1 bg-white shadow-sm">`;
+                dataTab1.forEach(l => {
+                    const sel = l.name === row.learner ? 'selected' : '';
+                    learnerSelect += `<option value="${l.name}" ${sel}>${l.name} (${l.id})</option>`;
+                });
+                learnerSelect += `</select>`;
+
+                let assetSelect = `<select onchange="dataTab3[${index}].asset=this.value; renderTab2(); renderTab3();" class="w-full border rounded-md p-1 font-mono bg-white shadow-sm">`;
+                dataTab2.forEach(a => {
+                    const sel = a.id === row.asset ? 'selected' : '';
+                    assetSelect += `<option value="${a.id}" ${sel}>${a.id} - ${a.type}</option>`;
+                });
+                assetSelect += `</select>`;
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="p-3 border-r font-mono"><input value="${row.txn}" onchange="dataTab3[${index}].txn=this.value" class="w-full bg-transparent"></td>
+                        <td class="p-3 border-r font-semibold">${learnerSelect}</td>
+                        <td class="p-3 border-r">${assetSelect}</td>
+                        <td class="p-3 border-r"><input type="date" value="${row.dateHired}" onchange="dataTab3[${index}].dateHired=this.value" class="w-full"></td>
+                        <td class="p-3 border-r text-center">
+                            <select onchange="dataTab3[${index}].home=this.value;" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
+                                <option value="Yes" ${row.home === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${row.home === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3 border-r"><input type="date" value="${row.due}" onchange="dataTab3[${index}].due=this.value; renderTab2(); renderTab3();" class="w-full"></td>
+                        <td class="p-3 border-r"><input type="date" value="${row.actual}" onchange="dataTab3[${index}].actual=this.value; renderTab2(); renderTab3();" class="w-full"></td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                    </tr>
+                `;
+            });
+
+            syncWorksheets();
+        }
+
+        // Add Rows
+        function addRowTab1() {
+            dataTab1.push({ id: `L00${dataTab1.length+1}`, name: "New Learner", grade: "Grade 10", inst: "Violin", test: "No", agreement: "No", storage: "No" });
+            renderTab1();
+        }
+        function addRowTab2() {
+            dataTab2.push({ id: `AMP-NEW-00${dataTab2.length+1}`, cat: "Strings", type: "Violin", brand: "Standard", status: "Available", loc: "Storage Room", damage: "None", cost: 0 });
+            renderTab2();
+        }
+        function addRowTab3() {
+            const firstLearner = dataTab1.length > 0 ? dataTab1[0].name : "Learner Name";
+            const firstAsset = dataTab2.length > 0 ? dataTab2[0].id : "AMP-VLNT-001";
+            dataTab3.push({ txn: `TXN-00${dataTab3.length+1}`, learner: firstLearner, asset: firstAsset, dateHired: new Date().toISOString().split('T')[0], home: "Yes", due: "2026-06-30", actual: "" });
+            renderTab3();
+            renderTab2();
+        }
+
+        // Update Dashboard calculations (Worksheet 4)
+        function updateDashboard() {
+            syncWorksheets();
+            const qualifiedCount = dataTab1.filter(r => r.test === 'Yes' && r.agreement === 'Yes' && r.storage === 'Yes').length;
+            const totalLearners = dataTab1.length;
+            const qualPercent = totalLearners > 0 ? Math.round((qualifiedCount / totalLearners) * 100) : 0;
+
+            const activeHires = dataTab3.filter(r => !r.actual || r.actual.trim() === '').length;
+            const homeLoans = dataTab3.filter(r => (!r.actual || r.actual.trim() === '') && r.home === 'Yes').length;
+
+            const today = new Date().toISOString().split('T')[0];
+            const overdueCount = dataTab3.filter(r => (!r.actual || r.actual.trim() === '') && r.due && r.due < today).length;
+
+            const repairAssets = dataTab2.filter(r => r.status === 'In Repair');
+            const totalRepairCost = repairAssets.reduce((sum, r) => sum + (r.cost || 0), 0);
+
+            document.getElementById('dash-qualified-count').innerText = qualifiedCount;
+            document.getElementById('dash-qualified-rate').innerText = `${qualPercent}% of total roster (${totalLearners})`;
+            document.getElementById('dash-active-count').innerText = activeHires;
+            document.getElementById('dash-home-count').innerText = `${homeLoans} Take-Home Approved`;
+            document.getElementById('dash-overdue-count').innerText = overdueCount;
+            document.getElementById('dash-repair-cost').innerText = `R ${totalRepairCost.toFixed(2)}`;
+            document.getElementById('dash-repair-count').innerText = `${repairAssets.length} assets in repair rack`;
+
+            document.getElementById('link-total-learners').innerText = totalLearners;
+            document.getElementById('link-qual-learners').innerText = qualifiedCount;
+            document.getElementById('link-total-assets').innerText = dataTab2.length;
+            document.getElementById('link-loan-assets').innerText = dataTab2.filter(r => r.status === 'On Hire').length;
+            document.getElementById('link-repair-assets').innerText = repairAssets.length;
+            document.getElementById('link-repair-total').innerText = `R ${totalRepairCost.toFixed(2)}`;
+        }
+
+        // Export Multi-Tab Excel Workbook (.XLSX)
+        function exportToExcelWorkbook() {
+            syncWorksheets();
+            const wb = XLSX.utils.book_new();
+
+            // Wk1
+            const ws1_data = dataTab1.map(r => ({
+                "Learner ID": r.id,
+                "Full Name": r.name,
+                "Grade": r.grade,
+                "Instrument Enrolled": r.inst,
+                "Knowledge Test Passed?": r.test,
+                "Agreement Signed?": r.agreement,
+                "Safe Storage Verified?": r.storage,
+                "Qualification Status": (r.test === "Yes" && r.agreement === "Yes" && r.storage === "Yes") ? "QUALIFIED" : "PENDING"
+            }));
+            const ws1 = XLSX.utils.json_to_sheet(ws1_data);
+            XLSX.utils.book_append_sheet(wb, ws1, "Learner_Qualification");
+
+            // Wk2
+            const ws2_data = dataTab2.map(r => ({
+                "AMP Asset ID": r.id,
+                "Category": r.cat,
+                "Instrument Type": r.type,
+                "Brand / Serial No": r.brand,
+                "Current Status": r.status,
+                "Storage Location": r.loc,
+                "Damage Description": r.damage,
+                "Est Repair Cost (R)": r.cost
+            }));
+            const ws2 = XLSX.utils.json_to_sheet(ws2_data);
+            XLSX.utils.book_append_sheet(wb, ws2, "Instrument_Asset_Master");
+
+            // Wk3
+            const today = new Date().toISOString().split('T')[0];
+            const ws3_data = dataTab3.map(r => {
+                let st = "ACTIVE";
+                if (r.actual && r.actual.trim() !== '') st = "RETURNED";
+                else if (r.due && r.due < today) st = "OVERDUE";
+                return {
+                    "Txn ID": r.txn,
+                    "Learner Name": r.learner,
+                    "AMP Asset ID": r.asset,
+                    "Date Hired": r.dateHired,
+                    "Home Approved?": r.home,
+                    "Return Due Date": r.due,
+                    "Actual Return Date": r.actual,
+                    "Loan Status": st
+                };
+            });
+            const ws3 = XLSX.utils.json_to_sheet(ws3_data);
+            XLSX.utils.book_append_sheet(wb, ws3, "Active_Hires_Log");
+
+            // Wk4 Dashboard
+            const qualifiedCount = dataTab1.filter(r => r.test === 'Yes' && r.agreement === 'Yes' && r.storage === 'Yes').length;
+            const activeHires = dataTab3.filter(r => !r.actual || r.actual.trim() === '').length;
+            const overdueCount = dataTab3.filter(r => (!r.actual || r.actual.trim() === '') && r.due && r.due < today).length;
+            const repairAssets = dataTab2.filter(r => r.status === 'In Repair');
+            const totalRepairCost = repairAssets.reduce((sum, r) => sum + (r.cost || 0), 0);
+
+            const ws4_data = [
+                ["ACCESS MUSIC PROJECT (AMP) - PM EXECUTIVE DASHBOARD SUMMARY"],
+                [],
+                ["Metric Name", "Calculated Value", "Formula Reference"],
+                ["Total Enrolled Learners", dataTab1.length, '=COUNTA(Learner_Qualification!A2:A100)'],
+                ["Qualified Learners", qualifiedCount, '=COUNTIF(Learner_Qualification!H2:H100, "QUALIFIED")'],
+                ["Total Fleet Assets", dataTab2.length, '=COUNTA(Instrument_Asset_Master!A2:A100)'],
+                ["Assets Currently On Hire", dataTab2.filter(r => r.status === 'On Hire').length, '=COUNTIF(Instrument_Asset_Master!E2:E100, "On Hire")'],
+                ["Active Loans Count", activeHires, '=COUNTIF(Active_Hires_Log!H2:H100, "ACTIVE")'],
+                ["Overdue Loans Count", overdueCount, '=COUNTIF(Active_Hires_Log!H2:H100, "OVERDUE")'],
+                ["Assets In Repair Rack", repairAssets.length, '=COUNTIF(Instrument_Asset_Master!E2:E100, "In Repair")'],
+                ["Est Total Repair Overhead (R)", totalRepairCost, '=SUMIF(Instrument_Asset_Master!E2:E100, "In Repair", Instrument_Asset_Master!H2:H100)']
+            ];
+            const ws4 = XLSX.utils.aoa_to_sheet(ws4_data);
+            XLSX.utils.book_append_sheet(wb, ws4, "PM_Dashboard");
+
+            // Save File
+            XLSX.writeFile(wb, "AMP_Integrated_Instrument_Hire_Tracker.xlsx");
+        }
+
+        // Initialize On Load
+        renderTab1();
+        renderTab2();
+        renderTab3();
+    </script>
+</body>
+</html>
