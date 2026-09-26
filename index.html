@@ -3,962 +3,920 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMP Instrument Hire Tracker & Web System</title>
+    <title>AMP - Instrument Tracking & Asset Management System</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SheetJS Library for Instant Multi-Tab Excel (.xlsx) Downloads -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (xlsx) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        .badge-green { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-        .badge-amber { background-color: #fef3c7; color: #b45309; border: 1px solid #fde047; }
-        .badge-blue { background-color: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
-        .badge-red { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
-        .badge-gray { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-        .modal-backdrop { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
+        .active-tab {
+            border-bottom: 3px solid #4f46e5;
+            color: #4f46e5;
+            font-weight: 600;
+        }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
 
-    <header class="bg-slate-900 text-white shadow-md border-b-4 border-blue-600">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-                <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
-                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12 0c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
-                    ACCESS MUSIC PROJECT (AMP)
-                </h1>
-                <p class="text-xs text-blue-300">Integrated Multi-Tab Instrument Hire & Asset Management System</p>
+    <!-- Top Header -->
+    <header class="bg-indigo-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-indigo-700 rounded-lg text-white">
+                    <i class="fa-solid fa-music fa-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Access Music Project (AMP)</h1>
+                    <p class="text-xs text-indigo-200">Instrument Tracking & Asset Management Dashboard</p>
+                </div>
             </div>
-            
-            <div class="flex flex-wrap items-center gap-2">
-                <button onclick="openResetModal()" class="bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
-                    <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    Clear Demo Data / Clean Slate
+            <div class="flex items-center space-x-3">
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-file-excel"></i> Export Multi-Tab Excel
                 </button>
-                <button onclick="restoreDemoData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
-                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    Load Sample Data
-                </button>
-                <button onclick="exportToExcelWorkbook()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Download Excel (.XLSX)
+                <button onclick="resetToSeedData()" class="bg-indigo-800 hover:bg-indigo-700 text-indigo-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5" title="Reset to initial seed data">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
                 </button>
             </div>
         </div>
     </header>
 
-    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-1 sm:space-x-2">
-            <button id="tab-btn-1" onclick="switchTab(1)" class="py-3 px-4 text-xs font-bold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-blue-600"></span> 1. Learner Qualification Roster
+    <!-- Global KPI Cards -->
+    <section class="max-w-7xl mx-auto px-4 mt-6 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Learners</p>
+                    <h3 id="kpi-total-learners" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-user-graduate fa-lg"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Assets</p>
+                    <h3 id="kpi-total-assets" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="p-3 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-guitar fa-lg"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Active Loans</p>
+                    <h3 id="kpi-active-loans" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-handshake fa-lg"></i></div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Available Assets</p>
+                    <h3 id="kpi-available-assets" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-circle-check fa-lg"></i></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow">
+        
+        <!-- Tab Navigation Bar -->
+        <div class="border-b border-slate-200 bg-white rounded-t-xl px-4 pt-2 flex flex-wrap gap-2 text-sm font-medium text-slate-600 shadow-sm">
+            <button onclick="switchTab('tab1')" id="nav-tab1" class="py-3 px-4 flex items-center gap-2 active-tab transition-all">
+                <i class="fa-solid fa-users"></i> Learner Roster
             </button>
-            <button id="tab-btn-2" onclick="switchTab(2)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-slate-300"></span> 2. Instrument Asset Master
+            <button onclick="switchTab('tab2')" id="nav-tab2" class="py-3 px-4 flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-boxes-stacked"></i> Instrument Assets
             </button>
-            <button id="tab-btn-3" onclick="switchTab(3)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-slate-300"></span> 3. Active Hires Log
+            <button onclick="switchTab('tab3')" id="nav-tab3" class="py-3 px-4 flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-clipboard-list"></i> Loan Registry
             </button>
-            <button id="tab-btn-4" onclick="switchTab(4)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-slate-300"></span> 4. Executive PM Dashboard
+            <button onclick="switchTab('tab4')" id="nav-tab4" class="py-3 px-4 flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-chart-pie"></i> PM Executive Analytics
             </button>
-            <button id="tab-btn-5" onclick="switchTab(5)" class="py-3 px-4 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> 5. Deployment Guide
+            <button onclick="switchTab('tab5')" id="nav-tab5" class="py-3 px-4 flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-circle-info"></i> Admin Guide
             </button>
         </div>
-    </nav>
 
-    <!-- Notification Toast Banner -->
-    <div id="toast-banner" class="hidden bg-emerald-600 text-white text-xs py-2 px-4 text-center font-semibold transition-all">
-        <span id="toast-msg">Action completed successfully.</span>
-    </div>
-
-    <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
-
-        <section id="tab-content-1" class="tab-page space-y-4">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Worksheet 1: Learner Qualification Roster</h2>
-                    <p class="text-xs text-slate-500">3-Gate Criteria: Learner is <span class="text-green-700 font-semibold">QUALIFIED</span> only when Knowledge Test, Agreement, and Safe Storage are all marked "Yes".</p>
+        <!-- TAB 1: LEARNER ROSTER -->
+        <div id="content-tab1" class="bg-white p-6 rounded-b-xl border border-t-0 border-slate-200 shadow-sm">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-tab1" oninput="renderTable1()" placeholder="Search learners..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <input type="text" id="search-tab1" oninput="renderTab1()" placeholder="Search learner..." class="px-3 py-1.5 text-xs border rounded-lg w-full sm:w-48 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    <button onclick="openModal('modal-add-learner')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition shadow-sm whitespace-nowrap">+ Add Learner</button>
-                </div>
+                <button onclick="openLearnerModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                    <i class="fa-solid fa-user-plus"></i> Add Learner
+                </button>
             </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
-                        <thead class="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3 border-r border-slate-200">Learner ID</th>
-                                <th class="p-3 border-r border-slate-200">Full Name</th>
-                                <th class="p-3 border-r border-slate-200">Grade</th>
-                                <th class="p-3 border-r border-slate-200">Instrument Enrolled</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Test Passed?</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Agreement Signed?</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Storage Verified?</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Qualification Status</th>
-                                <th class="p-3 text-center">Admin Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-tab1">
-                            <!-- Dynamic Content -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-3 font-semibold">ID</th>
+                            <th class="p-3 font-semibold">Learner Name</th>
+                            <th class="p-3 font-semibold">Level</th>
+                            <th class="p-3 font-semibold">Primary Instrument</th>
+                            <th class="p-3 font-semibold">Qualification</th>
+                            <th class="p-3 font-semibold">Status</th>
+                            <th class="p-3 font-semibold text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-tab1" class="divide-y divide-slate-200">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
             </div>
-        </section>
+        </div>
 
-        <section id="tab-content-2" class="tab-page hidden space-y-4">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Worksheet 2: Instrument Asset Master Register</h2>
-                    <p class="text-xs text-slate-500">Inventory of physical instruments. Status syncs automatically with Active Hires Log in Worksheet 3.</p>
+        <!-- TAB 2: INSTRUMENT ASSETS -->
+        <div id="content-tab2" class="bg-white p-6 rounded-b-xl border border-t-0 border-slate-200 shadow-sm hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-tab2" oninput="renderTable2()" placeholder="Search instruments..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <input type="text" id="search-tab2" oninput="renderTab2()" placeholder="Search asset ID/type..." class="px-3 py-1.5 text-xs border rounded-lg w-full sm:w-48 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    <button onclick="openModal('modal-add-asset')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition shadow-sm whitespace-nowrap">+ Register Asset</button>
-                </div>
+                <button onclick="openAssetModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                    <i class="fa-solid fa-plus"></i> Add Instrument Asset
+                </button>
             </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
-                        <thead class="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3 border-r border-slate-200">AMP Asset ID</th>
-                                <th class="p-3 border-r border-slate-200">Category</th>
-                                <th class="p-3 border-r border-slate-200">Instrument Type</th>
-                                <th class="p-3 border-r border-slate-200">Brand / Serial No</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Asset Status</th>
-                                <th class="p-3 border-r border-slate-200">Storage Location</th>
-                                <th class="p-3 border-r border-slate-200">Damage Notes</th>
-                                <th class="p-3 border-r border-slate-200 text-right">Est. Repair Cost (R)</th>
-                                <th class="p-3 text-center">Admin Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-tab2">
-                            <!-- Dynamic Content -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-3 font-semibold">Asset ID</th>
+                            <th class="p-3 font-semibold">Category</th>
+                            <th class="p-3 font-semibold">Brand</th>
+                            <th class="p-3 font-semibold">Model</th>
+                            <th class="p-3 font-semibold">Serial Number</th>
+                            <th class="p-3 font-semibold">Condition</th>
+                            <th class="p-3 font-semibold">Status</th>
+                            <th class="p-3 font-semibold text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-tab2" class="divide-y divide-slate-200">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
             </div>
-        </section>
+        </div>
 
-        <section id="tab-content-3" class="tab-page hidden space-y-4">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Worksheet 3: Active Hires & Loan Transaction Log</h2>
-                    <p class="text-xs text-slate-500">Cross-references qualified learners and assets. Overdue loans automatically flag red if today passes return due date.</p>
+        <!-- TAB 3: LOAN REGISTRY -->
+        <div id="content-tab3" class="bg-white p-6 rounded-b-xl border border-t-0 border-slate-200 shadow-sm hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="search-tab3" oninput="renderTable3()" placeholder="Search loan logs..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <input type="text" id="search-tab3" oninput="renderTab3()" placeholder="Search loan/learner..." class="px-3 py-1.5 text-xs border rounded-lg w-full sm:w-48 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
-                    <button onclick="openModal('modal-add-loan')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-3.5 py-2 rounded-lg font-semibold transition shadow-sm whitespace-nowrap">+ Log New Loan</button>
-                </div>
+                <button onclick="openLoanModal()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                    <i class="fa-solid fa-handshake"></i> Issue New Loan
+                </button>
             </div>
-
-            <div class="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
-                        <thead class="bg-slate-50 text-slate-900 font-bold border-b border-slate-200">
-                            <tr>
-                                <th class="p-3 border-r border-slate-200">Txn ID</th>
-                                <th class="p-3 border-r border-slate-200">Learner Name</th>
-                                <th class="p-3 border-r border-slate-200">AMP Asset ID</th>
-                                <th class="p-3 border-r border-slate-200">Date Hired</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Home Approved?</th>
-                                <th class="p-3 border-r border-slate-200">Return Due Date</th>
-                                <th class="p-3 border-r border-slate-200">Actual Return Date</th>
-                                <th class="p-3 border-r border-slate-200 text-center">Loan Status</th>
-                                <th class="p-3 text-center">Admin Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-tab3">
-                            <!-- Dynamic Content -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-3 font-semibold">Loan ID</th>
+                            <th class="p-3 font-semibold">Learner Name</th>
+                            <th class="p-3 font-semibold">Asset Tag</th>
+                            <th class="p-3 font-semibold">Hire Date</th>
+                            <th class="p-3 font-semibold">Expected Return</th>
+                            <th class="p-3 font-semibold">Loan Status</th>
+                            <th class="p-3 font-semibold">Notes</th>
+                            <th class="p-3 font-semibold text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-tab3" class="divide-y divide-slate-200">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
             </div>
-        </section>
+        </div>
 
-        <section id="tab-content-4" class="tab-page hidden space-y-6">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex justify-between items-center">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900">Worksheet 4: Executive PM Dashboard</h2>
-                    <p class="text-xs text-slate-500">Automated aggregate indicators linked live across Worksheets 1, 2, and 3.</p>
-                </div>
-                <span class="text-2xs bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full">Live Analytics</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-green-600">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-500 uppercase">Qualified Learners</span>
-                        <span class="text-2xs font-mono text-slate-400">=COUNTIF(Wk1)</span>
+        <!-- TAB 4: PM EXECUTIVE ANALYTICS -->
+        <div id="content-tab4" class="bg-white p-6 rounded-b-xl border border-t-0 border-slate-200 shadow-sm hidden space-y-6">
+            <h2 class="text-lg font-bold text-slate-800 border-b pb-3"><i class="fa-solid fa-chart-line text-indigo-600"></i> Executive Performance Metrics</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Asset Category Distribution -->
+                <div class="border rounded-xl p-5 bg-slate-50/50">
+                    <h3 class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-layer-group text-indigo-500"></i> Asset Category Breakdown</h3>
+                    <div id="analytics-category" class="space-y-3">
+                        <!-- Populated dynamically -->
                     </div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1" id="dash-qualified-count">0</div>
-                    <span class="text-xs text-slate-500" id="dash-qualified-rate">0% of total roster</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-blue-600">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-500 uppercase">Active Loans</span>
-                        <span class="text-2xs font-mono text-slate-400">=COUNTIF(Wk3)</span>
+
+                <!-- Qualification Status Distribution -->
+                <div class="border rounded-xl p-5 bg-slate-50/50">
+                    <h3 class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-award text-amber-500"></i> Learner Qualification Readiness</h3>
+                    <div id="analytics-qualification" class="space-y-3">
+                        <!-- Populated dynamically -->
                     </div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1" id="dash-active-count">0</div>
-                    <span class="text-xs text-slate-500" id="dash-home-count">0 Take-Home Approved</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-red-600">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-500 uppercase">Overdue Loans</span>
-                        <span class="text-2xs font-mono text-slate-400">=COUNTIF(Overdue)</span>
+            </div>
+
+            <!-- Asset Condition & Loan Status Breakdown -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="border rounded-xl p-5 bg-slate-50/50">
+                    <h3 class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-wrench text-slate-600"></i> Asset Condition Health</h3>
+                    <div id="analytics-condition" class="space-y-3">
+                        <!-- Populated dynamically -->
                     </div>
-                    <div class="text-2xl font-bold text-red-600 mt-1" id="dash-overdue-count">0</div>
-                    <span class="text-xs text-red-500">Requires follow-up</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow border-l-4 border-l-amber-500">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-500 uppercase">Repair Backlog Cost</span>
-                        <span class="text-2xs font-mono text-slate-400">=SUMIF(Wk2)</span>
+
+                <div class="border rounded-xl p-5 bg-slate-50/50">
+                    <h3 class="font-semibold text-slate-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-truck-ramp-box text-blue-500"></i> Inventory Deployment Status</h3>
+                    <div id="analytics-status" class="space-y-3">
+                        <!-- Populated dynamically -->
                     </div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1" id="dash-repair-cost">R 0.00</div>
-                    <span class="text-xs text-amber-700" id="dash-repair-count">0 assets in repair</span>
                 </div>
             </div>
+        </div>
 
-            <!-- Formula Summary Table -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
-                <h3 class="text-sm font-bold text-slate-800 border-b pb-2">Excel Formula Reference Mapping</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-slate-50 font-bold border-b">
-                            <tr>
-                                <th class="p-2.5 border-r">Metric Name</th>
-                                <th class="p-2.5 border-r">Calculated Value</th>
-                                <th class="p-2.5">Excel Formula Link</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y text-slate-700">
-                            <tr>
-                                <td class="p-2.5 border-r font-medium">Total Enrolled Learners</td>
-                                <td class="p-2.5 border-r font-bold" id="link-total-learners">0</td>
-                                <td class="p-2.5 font-mono text-blue-700">=COUNTA(Learner_Qualification!A2:A100)</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 border-r font-medium">Qualified Learners</td>
-                                <td class="p-2.5 border-r font-bold text-green-700" id="link-qual-learners">0</td>
-                                <td class="p-2.5 font-mono text-blue-700">=COUNTIF(Learner_Qualification!H2:H100, "QUALIFIED")</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 border-r font-medium">Total Fleet Stock</td>
-                                <td class="p-2.5 border-r font-bold" id="link-total-assets">0</td>
-                                <td class="p-2.5 font-mono text-blue-700">=COUNTA(Instrument_Asset_Master!A2:A100)</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 border-r font-medium">Assets On Loan</td>
-                                <td class="p-2.5 border-r font-bold text-blue-700" id="link-loan-assets">0</td>
-                                <td class="p-2.5 font-mono text-blue-700">=COUNTIF(Instrument_Asset_Master!E2:E100, "On Hire")</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 border-r font-medium">Assets In Repair Rack</td>
-                                <td class="p-2.5 border-r font-bold text-red-700" id="link-repair-assets">0</td>
-                                <td class="p-2.5 font-mono text-blue-700">=COUNTIF(Instrument_Asset_Master!E2:E100, "In Repair")</td>
-                            </tr>
-                            <tr>
-                                <td class="p-2.5 border-r font-medium">Total Repair Cost Overhead</td>
-                                <td class="p-2.5 border-r font-bold text-amber-700" id="link-repair-total">R 0.00</td>
-                                <td class="p-2.5 font-mono text-blue-700">=SUMIF(Instrument_Asset_Master!E2:E100, "In Repair", Instrument_Asset_Master!H2:H100)</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <!-- TAB 5: ADMIN GUIDE -->
+        <div id="content-tab5" class="bg-white p-6 rounded-b-xl border border-t-0 border-slate-200 shadow-sm hidden space-y-5">
+            <h2 class="text-lg font-bold text-slate-800 border-b pb-3"><i class="fa-solid fa-book-open text-indigo-600"></i> System Administration & Sync Guide</h2>
+            
+            <div class="prose max-w-none text-slate-600 space-y-4 text-sm leading-relaxed">
+                <div class="p-4 bg-indigo-50 border-l-4 border-indigo-600 rounded-r-lg text-indigo-900">
+                    <p class="font-semibold">Access Music Project (AMP) Asset Management Protocol</p>
+                    <p class="text-xs mt-1 text-indigo-800">This application facilitates seamless instrument tracking across learner cohorts, maintaining complete synchronization between active hires, learner qualifications, and physical asset conditions.</p>
                 </div>
+
+                <h3 class="font-bold text-slate-800 text-base mt-4">1. Automated Status Synchronization (`syncWorksheets`)</h3>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>When a loan log is marked as <strong>Active</strong>, the associated instrument asset automatically updates to <strong>On Hire</strong>.</li>
+                    <li>Assets flagged as <strong>In Repair</strong> or <strong>Decommissioned</strong> retain their primary status to prevent accidental overwrite during active loan sync.</li>
+                    <li>Marking a loan as <strong>Returned</strong> or <strong>Cancelled</strong> restores the corresponding instrument status to <strong>Available</strong>.</li>
+                </ul>
+
+                <h3 class="font-bold text-slate-800 text-base mt-4">2. Loan Eligibility Guardrails</h3>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>Loans should ideally be issued to learners with a <strong>QUALIFIED</strong> status to preserve instrument safety.</li>
+                    <li>Only assets currently listed as <strong>Available</strong> are selectable in the New Loan issuance modal.</li>
+                </ul>
+
+                <h3 class="font-bold text-slate-800 text-base mt-4">3. Data Persistence & Multi-Tab Excel Generation</h3>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>All edits, additions, and deletions auto-save immediately to browser <code>localStorage</code>.</li>
+                    <li>Clicking <strong>Export Multi-Tab Excel</strong> produces a structured <code>.xlsx</code> file containing four dedicated worksheets: Learners, Assets, Active Loans, and Executive Summary.</li>
+                </ul>
             </div>
-        </section>
-
-        <section id="tab-content-5" class="tab-page hidden space-y-6">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow">
-                <h2 class="text-base font-bold text-slate-900">Admin Guide: Deleting Records & Managing Clean Data</h2>
-                <p class="text-xs text-slate-500">Simple instructions for AMP staff on maintaining real data, deleting test items, and exporting clean spreadsheets.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
-                    <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-700 font-bold flex items-center justify-center text-sm">1</div>
-                    <h3 class="text-sm font-bold text-slate-900">Deleting Individual Records</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        To delete any learner, instrument, or loan transaction, simply click the red <strong>Delete</strong> button in the rightmost column of any table. A confirmation box will appear to prevent accidental clicks.
-                    </p>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm">2</div>
-                    <h3 class="text-sm font-bold text-slate-900">Automatic Storage & Persistence</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        All additions, inline text edits, and record deletions are automatically saved into your browser's local memory (`localStorage`). When you refresh or reopen the page, your data remains up-to-date.
-                    </p>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow space-y-3">
-                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm">3</div>
-                    <h3 class="text-sm font-bold text-slate-900">Exporting Fresh Excel Files</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Whenever you want an offline backup or Google Sheets upload, click <strong>Download Excel (.XLSX)</strong> at the top right. It will generate a clean, 4-tab workbook containing only your active records.
-                    </p>
-                </div>
-            </div>
-        </section>
+        </div>
 
     </main>
 
-    <!-- Modal: Add Learner -->
-    <div id="modal-add-learner" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 class="text-base font-bold text-slate-900">Add New Learner</h3>
-            <form onsubmit="handleAddLearner(event)" class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-semibold mb-1">Learner ID</label>
-                    <input id="form-learner-id" required type="text" placeholder="e.g. L006" class="w-full border rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label class="block font-semibold mb-1">Full Name</label>
-                    <input id="form-learner-name" required type="text" placeholder="First and Surname" class="w-full border rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-semibold mb-1">Grade</label>
-                        <input id="form-learner-grade" required type="text" placeholder="Grade 10" class="w-full border rounded-lg p-2 bg-slate-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1">Instrument</label>
-                        <input id="form-learner-inst" required type="text" placeholder="Violin" class="w-full border rounded-lg p-2 bg-slate-50">
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 border-t pt-3">
-                    <div>
-                        <label class="block font-semibold mb-1 text-2xs">Test Passed?</label>
-                        <select id="form-learner-test" class="w-full border rounded-lg p-1.5 bg-white">
-                            <option value="No">No</option>
-                            <option value="Yes">Yes</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1 text-2xs">Agreement Signed?</label>
-                        <select id="form-learner-agreement" class="w-full border rounded-lg p-1.5 bg-white">
-                            <option value="No">No</option>
-                            <option value="Yes">Yes</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1 text-2xs">Storage Verified?</label>
-                        <select id="form-learner-storage" class="w-full border rounded-lg p-1.5 bg-white">
-                            <option value="No">No</option>
-                            <option value="Yes">Yes</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex justify-end gap-2 pt-3">
-                    <button type="button" onclick="closeModal('modal-add-learner')" class="px-3 py-1.5 rounded-lg border text-slate-600 hover:bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">Save Learner</button>
-                </div>
-            </form>
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            &copy; 2026 Access Music Project (AMP). All rights reserved. | Instrument & Asset Management Dashboard
         </div>
-    </div>
+    </footer>
 
-    <!-- Modal: Add Asset -->
-    <div id="modal-add-asset" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 class="text-base font-bold text-slate-900">Register New Instrument Asset</h3>
-            <form onsubmit="handleAddAsset(event)" class="space-y-3 text-xs">
+    <!-- MODAL: ADD LEARNER -->
+    <div id="modal-learner" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800">Add New Learner</h3>
+                <button onclick="closeModal('modal-learner')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-learner" onsubmit="saveLearner(event)" class="space-y-3">
                 <div>
-                    <label class="block font-semibold mb-1">AMP Asset ID</label>
-                    <input id="form-asset-id" required type="text" placeholder="e.g. AMP-VLN-008" class="w-full border rounded-lg p-2 bg-slate-50">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block font-semibold mb-1">Category</label>
-                        <input id="form-asset-cat" required type="text" placeholder="Strings / Brass" class="w-full border rounded-lg p-2 bg-slate-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold mb-1">Instrument Type</label>
-                        <input id="form-asset-type" required type="text" placeholder="Violin 4/4" class="w-full border rounded-lg p-2 bg-slate-50">
-                    </div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Learner ID</label>
+                    <input type="text" id="m-learner-id" required placeholder="e.g. L011" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Brand / Serial Number</label>
-                    <input id="form-asset-brand" required type="text" placeholder="Yamaha / SN12345" class="w-full border rounded-lg p-2 bg-slate-50">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="m-learner-name" required placeholder="e.g. Lungelo Zulu" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Initial Status</label>
-                    <select id="form-asset-status" class="w-full border rounded-lg p-2 bg-white">
-                        <option value="Available">Available</option>
-                        <option value="In Repair">In Repair</option>
-                        <option value="Decommissioned">Decommissioned</option>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Level</label>
+                    <select id="m-learner-level" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="Level 1">Level 1</option>
+                        <option value="Level 2">Level 2</option>
+                        <option value="Level 3">Level 3</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Storage Location</label>
-                    <input id="form-asset-loc" required type="text" placeholder="Shelf A1 / Room 2" class="w-full border rounded-lg p-2 bg-slate-50">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Primary Instrument</label>
+                    <input type="text" id="m-learner-instrument" required placeholder="e.g. Alto Saxophone" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="flex justify-end gap-2 pt-3">
-                    <button type="button" onclick="closeModal('modal-add-asset')" class="px-3 py-1.5 rounded-lg border text-slate-600 hover:bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">Save Asset</button>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Qualification Status</label>
+                    <select id="m-learner-qualification" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="QUALIFIED">QUALIFIED</option>
+                        <option value="IN PROGRESS">IN PROGRESS</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Enrollment Status</label>
+                    <select id="m-learner-status" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="Active">Active</option>
+                        <option value="Graduated">Graduated</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-learner')" class="px-4 py-2 border rounded-lg text-sm text-slate-600 hover:bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">Save Learner</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Add Loan -->
-    <div id="modal-add-loan" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 class="text-base font-bold text-slate-900">Log New Loan Transaction</h3>
-            <form onsubmit="handleAddLoan(event)" class="space-y-3 text-xs">
+    <!-- MODAL: ADD ASSET -->
+    <div id="modal-asset" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800">Add Instrument Asset</h3>
+                <button onclick="closeModal('modal-asset')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-asset" onsubmit="saveAsset(event)" class="space-y-3">
                 <div>
-                    <label class="block font-semibold mb-1">Transaction ID</label>
-                    <input id="form-loan-txn" required type="text" placeholder="TXN-101" class="w-full border rounded-lg p-2 bg-slate-50">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Asset Tag ID</label>
+                    <input type="text" id="m-asset-id" required placeholder="e.g. AMP-SAX-03" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Learner Name</label>
-                    <select id="form-loan-learner" class="w-full border rounded-lg p-2 bg-white" required>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Category</label>
+                    <select id="m-asset-category" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="Woodwind">Woodwind</option>
+                        <option value="Brass">Brass</option>
+                        <option value="Strings">Strings</option>
+                        <option value="Percussion">Percussion</option>
+                        <option value="Keyboards">Keyboards</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Brand</label>
+                        <input type="text" id="m-asset-brand" required placeholder="e.g. Yamaha" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Model</label>
+                        <input type="text" id="m-asset-model" required placeholder="e.g. YAS-280" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Serial Number</label>
+                    <input type="text" id="m-asset-serial" required placeholder="e.g. SN-99401" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Condition</label>
+                        <select id="m-asset-condition" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
+                        <select id="m-asset-status" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="Available">Available</option>
+                            <option value="On Hire">On Hire</option>
+                            <option value="In Repair">In Repair</option>
+                            <option value="Decommissioned">Decommissioned</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-asset')" class="px-4 py-2 border rounded-lg text-sm text-slate-600 hover:bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">Save Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ISSUE LOAN -->
+    <div id="modal-loan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800">Issue Instrument Loan</h3>
+                <button onclick="closeModal('modal-loan')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="form-loan" onsubmit="saveLoan(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Loan ID</label>
+                    <input type="text" id="m-loan-id" required placeholder="e.g. LN-2026-05" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Select Learner</label>
+                    <select id="m-loan-learner" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <!-- Dynamic options -->
                     </select>
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">AMP Asset ID</label>
-                    <select id="form-loan-asset" class="w-full border rounded-lg p-2 bg-white" required>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Select Available Asset</label>
+                    <select id="m-loan-asset" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         <!-- Dynamic options -->
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block font-semibold mb-1">Date Hired</label>
-                        <input id="form-loan-hired" required type="date" class="w-full border rounded-lg p-2 bg-slate-50">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Hire Date</label>
+                        <input type="date" id="m-loan-hire-date" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block font-semibold mb-1">Return Due Date</label>
-                        <input id="form-loan-due" required type="date" class="w-full border rounded-lg p-2 bg-slate-50">
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Expected Return</label>
+                        <input type="date" id="m-loan-return-date" required class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     </div>
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Take-Home Approved?</label>
-                    <select id="form-loan-home" class="w-full border rounded-lg p-2 bg-white">
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Notes / Purpose</label>
+                    <input type="text" id="m-loan-notes" placeholder="e.g. Practice & Ensemble preparation" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="flex justify-end gap-2 pt-3">
-                    <button type="button" onclick="closeModal('modal-add-loan')" class="px-3 py-1.5 rounded-lg border text-slate-600 hover:bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">Log Loan</button>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modal-loan')" class="px-4 py-2 border rounded-lg text-sm text-slate-600 hover:bg-slate-100">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">Issue Loan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Custom Delete Confirmation Modal -->
-    <div id="modal-confirm-delete" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
-            <div class="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            </div>
-            <h3 class="text-base font-bold text-slate-900">Confirm Record Deletion</h3>
-            <p id="delete-prompt-msg" class="text-xs text-slate-500">Are you sure you want to remove this record? This action cannot be undone.</p>
-            <div class="flex justify-center gap-3 pt-2">
-                <button onclick="closeModal('modal-confirm-delete')" class="px-4 py-2 rounded-lg border text-slate-600 hover:bg-slate-100 text-xs font-semibold">Cancel</button>
-                <button id="btn-confirm-delete" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm">Delete Record</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Reset Confirmation Modal -->
-    <div id="modal-confirm-reset" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
-            <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            </div>
-            <h3 class="text-base font-bold text-slate-900">Clear All Demo Data?</h3>
-            <p class="text-xs text-slate-500">This will wipe all sample records across all tabs so you can start with a completely clean slate.</p>
-            <div class="flex justify-center gap-3 pt-2">
-                <button onclick="closeModal('modal-confirm-reset')" class="px-4 py-2 rounded-lg border text-slate-600 hover:bg-slate-100 text-xs font-semibold">Cancel</button>
-                <button onclick="executeCleanSlate()" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-sm">Wipe All Data</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
     <script>
-        const DEFAULT_DATA_TAB1 = [
-            { id: "L001", name: "Sipho Ndlovu", grade: "Grade 10", inst: "Violin", test: "Yes", agreement: "Yes", storage: "Yes" },
-            { id: "L002", name: "Thandiwe Khumalo", grade: "Grade 11", inst: "Alto Saxophone", test: "Yes", agreement: "Yes", storage: "Yes" },
-            { id: "L003", name: "Buhle Mokoena", grade: "Grade 9", inst: "Cello", test: "Yes", agreement: "No", storage: "Yes" },
-            { id: "L004", name: "Lwandle Dlamini", grade: "Grade 12", inst: "Trumpet", test: "No", agreement: "No", storage: "No" },
-            { id: "L005", name: "Kamvalethu Botha", grade: "Grade 10", inst: "Bass Guitar", test: "Yes", agreement: "Yes", storage: "Yes" }
+        // --- SEED DATA CONFIGURATION ---
+        const seedLearners = [
+            { id: "L001", name: "Siyabonga Nene", level: "Level 3", instrument: "Alto Saxophone", qualification: "QUALIFIED", status: "Active" },
+            { id: "L002", name: "Thabo Mokoena", level: "Level 2", instrument: "Trumpet", qualification: "QUALIFIED", status: "Active" },
+            { id: "L003", name: "Nomvula Khumalo", level: "Level 1", instrument: "Violin", qualification: "IN PROGRESS", status: "Active" },
+            { id: "L004", name: "Bukhosi Dlamini", level: "Level 3", instrument: "Clarinet", qualification: "QUALIFIED", status: "Active" },
+            { id: "L005", name: "Zintle Ndlovu", level: "Level 2", instrument: "Tenor Saxophone", qualification: "QUALIFIED", status: "Active" },
+            { id: "L006", name: "Lwandle Pillay", level: "Level 1", instrument: "Flute", qualification: "IN PROGRESS", status: "Active" },
+            { id: "L007", name: "Ayanda Botha", level: "Level 3", instrument: "Trombone", qualification: "QUALIFIED", status: "Active" },
+            { id: "L008", name: "Keanu Peters", level: "Level 2", instrument: "Classical Guitar", qualification: "QUALIFIED", status: "Active" },
+            { id: "L009", name: "Siphesihle Zondi", level: "Level 1", instrument: "Violin", qualification: "IN PROGRESS", status: "Active" },
+            { id: "L010", name: "Unathi Mgcina", level: "Level 3", instrument: "Alto Saxophone", qualification: "QUALIFIED", status: "Graduated" }
         ];
 
-        const DEFAULT_DATA_TAB2 = [
-            { id: "AMP-VLNT-007", cat: "Strings", type: "Violin 4/4", brand: "Yamaha / SN771", status: "On Hire", loc: "Learner Home", damage: "None", cost: 0 },
-            { id: "AMP-ASX-011", cat: "Woodwind", type: "Alto Saxophone", brand: "Jupiter / SN332", status: "On Hire", loc: "Learner Home", damage: "None", cost: 0 },
-            { id: "AMP-VLCT-003", cat: "Strings", type: "Cello", brand: "Strunal / SN102", status: "Available", loc: "Shelf B1", damage: "None", cost: 0 },
-            { id: "AMP-TPT-013", cat: "Brass", type: "Trumpet", brand: "Bach / SN998", status: "In Repair", loc: "Repair Rack", damage: "Stuck Valve", cost: 450 },
-            { id: "AMP-BGS-003", cat: "Strings", type: "Bass Guitar", brand: "Ibanez / SN441", status: "On Hire", loc: "Learner Home", damage: "None", cost: 0 }
+        const seedAssets = [
+            { id: "AMP-SAX-01", category: "Woodwind", brand: "Yamaha", model: "YAS-280", serial: "Y893102", condition: "Good", status: "On Hire" },
+            { id: "AMP-SAX-02", category: "Woodwind", brand: "Jupiter", model: "JAS-1100", serial: "J440129", condition: "Excellent", status: "Available" },
+            { id: "AMP-TRP-01", category: "Brass", brand: "Bach", model: "TR300", serial: "B773910", condition: "Good", status: "On Hire" },
+            { id: "AMP-TRP-02", category: "Brass", brand: "Yamaha", model: "YTR-2330", serial: "Y204851", condition: "Fair", status: "In Repair" },
+            { id: "AMP-VLN-01", category: "Strings", brand: "Stentor", model: "Student II", serial: "ST-8840", condition: "Good", status: "Available" },
+            { id: "AMP-VLN-02", category: "Strings", brand: "Yamaha", model: "V5SC", serial: "YV-11029", condition: "Fair", status: "Available" },
+            { id: "AMP-CLR-01", category: "Woodwind", brand: "Buffet Crampon", model: "Prodige", serial: "BC-90182", condition: "Excellent", status: "On Hire" },
+            { id: "AMP-FLT-01", category: "Woodwind", brand: "Pearl", model: "PF-505E", serial: "P55019", condition: "Good", status: "Available" },
+            { id: "AMP-TRB-01", category: "Brass", brand: "Yamaha", model: "YSL-354", serial: "Y902184", condition: "Good", status: "On Hire" },
+            { id: "AMP-GTR-01", category: "Strings", brand: "Cordoba", model: "C5", serial: "CD-3091", condition: "Fair", status: "Decommissioned" }
         ];
 
-        const DEFAULT_DATA_TAB3 = [
-            { txn: "TXN-001", learner: "Sipho Ndlovu", asset: "AMP-VLNT-007", dateHired: "2026-02-01", home: "Yes", due: "2026-06-15", actual: "" },
-            { txn: "TXN-002", learner: "Thandiwe Khumalo", asset: "AMP-ASX-011", dateHired: "2026-02-03", home: "Yes", due: "2026-06-15", actual: "" },
-            { txn: "TXN-003", learner: "Kamvalethu Botha", asset: "AMP-BGS-003", dateHired: "2026-01-10", home: "Yes", due: "2026-03-01", actual: "" }
+        const seedLoans = [
+            { id: "LN-2026-01", learnerId: "L001", learnerName: "Siyabonga Nene", assetId: "AMP-SAX-01", hireDate: "2026-02-10", expectedReturn: "2026-06-30", status: "Active", notes: "Annual practice hire" },
+            { id: "LN-2026-02", learnerId: "L002", learnerName: "Thabo Mokoena", assetId: "AMP-TRP-01", hireDate: "2026-02-15", expectedReturn: "2026-06-30", status: "Active", notes: "Ensemble performance preparation" },
+            { id: "LN-2026-03", learnerId: "L004", learnerName: "Bukhosi Dlamini", assetId: "AMP-CLR-01", hireDate: "2026-03-01", expectedReturn: "2026-11-15", status: "Active", notes: "Advanced coursework loan" },
+            { id: "LN-2026-04", learnerId: "L007", learnerName: "Ayanda Botha", assetId: "AMP-TRB-01", hireDate: "2026-03-05", expectedReturn: "2026-11-15", status: "Active", notes: "Term 1-4 loan agreement" }
         ];
 
+        // --- GLOBAL STATE ---
         let dataTab1 = [];
         let dataTab2 = [];
         let dataTab3 = [];
-        let pendingDeleteFn = null;
 
-        function initApp() {
-            const saved1 = localStorage.getItem('amp_v2_tab1');
-            const saved2 = localStorage.getItem('amp_v2_tab2');
-            const saved3 = localStorage.getItem('amp_v2_tab3');
+        // --- INITIALIZATION ---
+        function initData() {
+            const raw1 = localStorage.getItem('dataTab1');
+            const raw2 = localStorage.getItem('dataTab2');
+            const raw3 = localStorage.getItem('dataTab3');
 
-            if (saved1 !== null && saved2 !== null && saved3 !== null) {
-                dataTab1 = JSON.parse(saved1);
-                dataTab2 = JSON.parse(saved2);
-                dataTab3 = JSON.parse(saved3);
-            } else {
-                restoreDemoData(false);
-            }
-            renderAllTabs();
+            dataTab1 = raw1 ? JSON.parse(raw1) : [...seedLearners];
+            dataTab2 = raw2 ? JSON.parse(raw2) : [...seedAssets];
+            dataTab3 = raw3 ? JSON.parse(raw3) : [...seedLoans];
+
+            saveData();
+            syncWorksheets();
+            refreshUI();
         }
 
         function saveData() {
-            localStorage.setItem('amp_v2_tab1', JSON.stringify(dataTab1));
-            localStorage.setItem('amp_v2_tab2', JSON.stringify(dataTab2));
-            localStorage.setItem('amp_v2_tab3', JSON.stringify(dataTab3));
-            updateDashboard();
+            localStorage.setItem('dataTab1', JSON.stringify(dataTab1));
+            localStorage.setItem('dataTab2', JSON.stringify(dataTab2));
+            localStorage.setItem('dataTab3', JSON.stringify(dataTab3));
         }
 
-        function showToast(msg) {
-            const banner = document.getElementById('toast-banner');
-            document.getElementById('toast-msg').innerText = msg;
-            banner.classList.remove('hidden');
-            setTimeout(() => banner.classList.add('hidden'), 3000);
-        }
-
-        function switchTab(tabNum) {
-            document.querySelectorAll('.tab-page').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-content-${tabNum}`).classList.remove('hidden');
-
-            for (let i = 1; i <= 5; i++) {
-                const btn = document.getElementById(`tab-btn-${i}`);
-                const dot = btn.querySelector('span');
-                if (i === tabNum) {
-                    btn.classList.add('border-blue-600', 'text-blue-600');
-                    btn.classList.remove('border-transparent', 'text-slate-500');
-                    if (dot) dot.className = "w-2 h-2 rounded-full bg-blue-600";
-                } else {
-                    btn.classList.remove('border-blue-600', 'text-blue-600');
-                    btn.classList.add('border-transparent', 'text-slate-500');
-                    if (dot) dot.className = "w-2 h-2 rounded-full bg-slate-300";
-                }
+        function resetToSeedData() {
+            if (confirm("Reset all data back to initial seed state? Any custom edits will be restored to default.")) {
+                localStorage.removeItem('dataTab1');
+                localStorage.removeItem('dataTab2');
+                localStorage.removeItem('dataTab3');
+                initData();
             }
-            if (tabNum === 4) updateDashboard();
+        }
+
+        // --- SYNCHRONIZATION LOGIC ---
+        function syncWorksheets() {
+            const activeLoanAssetIds = new Set(
+                dataTab3.filter(loan => loan.status === 'Active').map(loan => loan.assetId)
+            );
+
+            dataTab2.forEach(asset => {
+                if (activeLoanAssetIds.has(asset.id)) {
+                    if (asset.status !== 'In Repair' && asset.status !== 'Decommissioned') {
+                        asset.status = 'On Hire';
+                    }
+                } else {
+                    if (asset.status === 'On Hire') {
+                        asset.status = 'Available';
+                    }
+                }
+            });
+            saveData();
+        }
+
+        // --- UI REFRESH & NAVIGATION ---
+        function refreshUI() {
+            renderKPIs();
+            renderTable1();
+            renderTable2();
+            renderTable3();
+            renderAnalytics();
+        }
+
+        function switchTab(tabId) {
+            ['tab1', 'tab2', 'tab3', 'tab4', 'tab5'].forEach(id => {
+                document.getElementById(`content-${id}`).classList.add('hidden');
+                document.getElementById(`nav-${id}`).classList.remove('active-tab');
+            });
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).classList.add('active-tab');
+        }
+
+        function renderKPIs() {
+            document.getElementById('kpi-total-learners').textContent = dataTab1.length;
+            document.getElementById('kpi-total-assets').textContent = dataTab2.length;
+            document.getElementById('kpi-active-loans').textContent = dataTab3.filter(l => l.status === 'Active').length;
+            document.getElementById('kpi-available-assets').textContent = dataTab2.filter(a => a.status === 'Available').length;
+        }
+
+        // --- RENDER TABLES ---
+        function renderTable1() {
+            const query = (document.getElementById('search-tab1')?.value || '').toLowerCase();
+            const tbody = document.getElementById('tbody-tab1');
+            tbody.innerHTML = '';
+
+            const filtered = dataTab1.filter(l => 
+                l.id.toLowerCase().includes(query) ||
+                l.name.toLowerCase().includes(query) ||
+                l.instrument.toLowerCase().includes(query)
+            );
+
+            filtered.forEach((learner) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-700">${escapeHtml(learner.id)}</td>
+                    <td class="p-3 font-medium text-slate-800">${escapeHtml(learner.name)}</td>
+                    <td class="p-3">${escapeHtml(learner.level)}</td>
+                    <td class="p-3">${escapeHtml(learner.instrument)}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${learner.qualification === 'QUALIFIED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                            ${escapeHtml(learner.qualification)}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${learner.status === 'Active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}">
+                            ${escapeHtml(learner.status)}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteLearner('${learner.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Delete Learner">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderTable2() {
+            const query = (document.getElementById('search-tab2')?.value || '').toLowerCase();
+            const tbody = document.getElementById('tbody-tab2');
+            tbody.innerHTML = '';
+
+            const filtered = dataTab2.filter(a => 
+                a.id.toLowerCase().includes(query) ||
+                a.brand.toLowerCase().includes(query) ||
+                a.model.toLowerCase().includes(query) ||
+                a.category.toLowerCase().includes(query)
+            );
+
+            filtered.forEach((asset) => {
+                let statusBadge = "bg-slate-100 text-slate-600";
+                if (asset.status === 'Available') statusBadge = "bg-emerald-100 text-emerald-700";
+                if (asset.status === 'On Hire') statusBadge = "bg-blue-100 text-blue-700";
+                if (asset.status === 'In Repair') statusBadge = "bg-amber-100 text-amber-700";
+                if (asset.status === 'Decommissioned') statusBadge = "bg-rose-100 text-rose-700";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-700">${escapeHtml(asset.id)}</td>
+                    <td class="p-3">${escapeHtml(asset.category)}</td>
+                    <td class="p-3">${escapeHtml(asset.brand)}</td>
+                    <td class="p-3">${escapeHtml(asset.model)}</td>
+                    <td class="p-3 font-mono text-xs text-slate-500">${escapeHtml(asset.serial)}</td>
+                    <td class="p-3">${escapeHtml(asset.condition)}</td>
+                    <td class="p-3">
+                        <select onchange="updateAssetStatus('${asset.id}', this.value)" class="text-xs font-semibold px-2 py-1 rounded-full ${statusBadge} border-0 focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                            <option value="Available" ${asset.status === 'Available' ? 'selected' : ''}>Available</option>
+                            <option value="On Hire" ${asset.status === 'On Hire' ? 'selected' : ''}>On Hire</option>
+                            <option value="In Repair" ${asset.status === 'In Repair' ? 'selected' : ''}>In Repair</option>
+                            <option value="Decommissioned" ${asset.status === 'Decommissioned' ? 'selected' : ''}>Decommissioned</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteAsset('${asset.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Delete Asset">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderTable3() {
+            const query = (document.getElementById('search-tab3')?.value || '').toLowerCase();
+            const tbody = document.getElementById('tbody-tab3');
+            tbody.innerHTML = '';
+
+            const filtered = dataTab3.filter(l => 
+                l.id.toLowerCase().includes(query) ||
+                l.learnerName.toLowerCase().includes(query) ||
+                l.assetId.toLowerCase().includes(query)
+            );
+
+            filtered.forEach((loan) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-700">${escapeHtml(loan.id)}</td>
+                    <td class="p-3 font-medium text-slate-800">${escapeHtml(loan.learnerName)}</td>
+                    <td class="p-3 font-mono text-xs">${escapeHtml(loan.assetId)}</td>
+                    <td class="p-3 text-slate-600">${escapeHtml(loan.hireDate)}</td>
+                    <td class="p-3 text-slate-600">${escapeHtml(loan.expectedReturn)}</td>
+                    <td class="p-3">
+                        <select onchange="updateLoanStatus('${loan.id}', this.value)" class="text-xs font-semibold px-2 py-1 rounded-full ${loan.status === 'Active' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'} border-0 focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                            <option value="Active" ${loan.status === 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="Returned" ${loan.status === 'Returned' ? 'selected' : ''}>Returned</option>
+                            <option value="Overdue" ${loan.status === 'Overdue' ? 'selected' : ''}>Overdue</option>
+                        </select>
+                    </td>
+                    <td class="p-3 text-xs text-slate-500">${escapeHtml(loan.notes || '-')}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteLoan('${loan.id}')" class="text-rose-500 hover:text-rose-700 p-1" title="Delete Loan Log">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderAnalytics() {
+            const categories = {};
+            dataTab2.forEach(a => categories[a.category] = (categories[a.category] || 0) + 1);
+            document.getElementById('analytics-category').innerHTML = Object.entries(categories).map(([cat, count]) => `
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium">${escapeHtml(cat)}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-32 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-indigo-600 h-full" style="width: ${(count / dataTab2.length * 100) || 0}%"></div>
+                        </div>
+                        <span class="font-semibold text-slate-700 w-6 text-right">${count}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const qual = { QUALIFIED: 0, "IN PROGRESS": 0 };
+            dataTab1.forEach(l => qual[l.qualification] = (qual[l.qualification] || 0) + 1);
+            document.getElementById('analytics-qualification').innerHTML = Object.entries(qual).map(([q, count]) => `
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium">${escapeHtml(q)}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-32 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="${q === 'QUALIFIED' ? 'bg-emerald-500' : 'bg-amber-500'} h-full" style="width: ${(count / dataTab1.length * 100) || 0}%"></div>
+                        </div>
+                        <span class="font-semibold text-slate-700 w-6 text-right">${count}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const conditions = {};
+            dataTab2.forEach(a => conditions[a.condition] = (conditions[a.condition] || 0) + 1);
+            document.getElementById('analytics-condition').innerHTML = Object.entries(conditions).map(([cond, count]) => `
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium">${escapeHtml(cond)}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-32 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-slate-600 h-full" style="width: ${(count / dataTab2.length * 100) || 0}%"></div>
+                        </div>
+                        <span class="font-semibold text-slate-700 w-6 text-right">${count}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const statuses = {};
+            dataTab2.forEach(a => statuses[a.status] = (statuses[a.status] || 0) + 1);
+            document.getElementById('analytics-status').innerHTML = Object.entries(statuses).map(([st, count]) => `
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-600 font-medium">${escapeHtml(st)}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="w-32 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-blue-600 h-full" style="width: ${(count / dataTab2.length * 100) || 0}%"></div>
+                        </div>
+                        <span class="font-semibold text-slate-700 w-6 text-right">${count}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- HANDLERS & MODALS ---
+        function updateAssetStatus(assetId, newStatus) {
+            const asset = dataTab2.find(a => a.id === assetId);
+            if (asset) {
+                asset.status = newStatus;
+                saveData();
+                refreshUI();
+            }
+        }
+
+        function updateLoanStatus(loanId, newStatus) {
+            const loan = dataTab3.find(l => l.id === loanId);
+            if (loan) {
+                loan.status = newStatus;
+                syncWorksheets();
+                refreshUI();
+            }
+        }
+
+        function deleteLearner(id) {
+            if (confirm(`Remove learner ${id}?`)) {
+                dataTab1 = dataTab1.filter(l => l.id !== id);
+                saveData();
+                refreshUI();
+            }
+        }
+
+        function deleteAsset(id) {
+            if (confirm(`Remove asset ${id}?`)) {
+                dataTab2 = dataTab2.filter(a => a.id !== id);
+                saveData();
+                syncWorksheets();
+                refreshUI();
+            }
+        }
+
+        function deleteLoan(id) {
+            if (confirm(`Remove loan log ${id}?`)) {
+                dataTab3 = dataTab3.filter(l => l.id !== id);
+                syncWorksheets();
+                refreshUI();
+            }
         }
 
         function openModal(id) {
-            if (id === 'modal-add-loan') populateLoanDropdowns();
             document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
         }
 
         function closeModal(id) {
             document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
         }
 
-        function syncWorksheets() {
-            dataTab2.forEach(asset => {
-                if (asset.status !== 'In Repair' && asset.status !== 'Decommissioned') {
-                    asset.status = 'Available';
-                }
-            });
-
-            dataTab3.forEach(loan => {
-                if (!loan.actual || loan.actual.trim() === '') {
-                    const matchedAsset = dataTab2.find(a => a.id === loan.asset);
-                    if (matchedAsset && matchedAsset.status !== 'In Repair') {
-                        matchedAsset.status = 'On Hire';
-                    }
-                }
-            });
+        function openLearnerModal() {
+            document.getElementById('form-learner').reset();
+            openModal('modal-learner');
         }
 
-        function renderTab1() {
-            const tbody = document.getElementById('tbody-tab1');
-            const search = (document.getElementById('search-tab1').value || '').toLowerCase();
-            tbody.innerHTML = '';
-
-            dataTab1.forEach((row, index) => {
-                if (search && !row.name.toLowerCase().includes(search) && !row.id.toLowerCase().includes(search)) return;
-
-                const isQualified = row.test === "Yes" && row.agreement === "Yes" && row.storage === "Yes";
-                const statusBadge = isQualified 
-                    ? `<span class="badge-green px-2.5 py-1 rounded-full font-bold text-xs">QUALIFIED</span>`
-                    : `<span class="badge-amber px-2.5 py-1 rounded-full font-bold text-xs">PENDING</span>`;
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 border-r font-mono"><input value="${row.id}" onchange="dataTab1[${index}].id=this.value; saveData();" class="w-full bg-transparent"></td>
-                        <td class="p-3 border-r"><input value="${row.name}" onchange="dataTab1[${index}].name=this.value; saveData();" class="w-full font-semibold"></td>
-                        <td class="p-3 border-r"><input value="${row.grade}" onchange="dataTab1[${index}].grade=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r"><input value="${row.inst}" onchange="dataTab1[${index}].inst=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r text-center">
-                            <select onchange="dataTab1[${index}].test=this.value; saveData(); renderTab1();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
-                                <option value="Yes" ${row.test === 'Yes' ? 'selected' : ''}>Yes</option>
-                                <option value="No" ${row.test === 'No' ? 'selected' : ''}>No</option>
-                            </select>
-                        </td>
-                        <td class="p-3 border-r text-center">
-                            <select onchange="dataTab1[${index}].agreement=this.value; saveData(); renderTab1();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
-                                <option value="Yes" ${row.agreement === 'Yes' ? 'selected' : ''}>Yes</option>
-                                <option value="No" ${row.agreement === 'No' ? 'selected' : ''}>No</option>
-                            </select>
-                        </td>
-                        <td class="p-3 border-r text-center">
-                            <select onchange="dataTab1[${index}].storage=this.value; saveData(); renderTab1();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
-                                <option value="Yes" ${row.storage === 'Yes' ? 'selected' : ''}>Yes</option>
-                                <option value="No" ${row.storage === 'No' ? 'selected' : ''}>No</option>
-                            </select>
-                        </td>
-                        <td class="p-3 border-r text-center">${statusBadge}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="confirmDelete('learner', ${index}, '${row.name}')" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 px-2.5 py-1 rounded-md font-semibold transition">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            if (tbody.children.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400 italic">No learners found. Click "+ Add Learner" to register one.</td></tr>`;
-            }
-        }
-
-        function renderTab2() {
-            syncWorksheets();
-            const tbody = document.getElementById('tbody-tab2');
-            const search = (document.getElementById('search-tab2').value || '').toLowerCase();
-            tbody.innerHTML = '';
-
-            dataTab2.forEach((row, index) => {
-                if (search && !row.id.toLowerCase().includes(search) && !row.type.toLowerCase().includes(search)) return;
-
-                let badgeClass = 'badge-gray';
-                if (row.status === 'Available') badgeClass = 'badge-green';
-                if (row.status === 'On Hire') badgeClass = 'badge-blue';
-                if (row.status === 'In Repair') badgeClass = 'badge-red';
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 border-r font-mono font-bold"><input value="${row.id}" onchange="dataTab2[${index}].id=this.value; saveData(); renderTab3();" class="w-full bg-transparent"></td>
-                        <td class="p-3 border-r"><input value="${row.cat}" onchange="dataTab2[${index}].cat=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r"><input value="${row.type}" onchange="dataTab2[${index}].type=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r"><input value="${row.brand}" onchange="dataTab2[${index}].brand=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r text-center">
-                            <select onchange="dataTab2[${index}].status=this.value; saveData(); renderTab2();" class="border rounded-md px-2 py-1 text-xs ${badgeClass} font-bold shadow-sm">
-                                <option value="Available" ${row.status === 'Available' ? 'selected' : ''}>Available</option>
-                                <option value="On Hire" ${row.status === 'On Hire' ? 'selected' : ''}>On Hire</option>
-                                <option value="In Repair" ${row.status === 'In Repair' ? 'selected' : ''}>In Repair</option>
-                                <option value="Decommissioned" ${row.status === 'Decommissioned' ? 'selected' : ''}>Decommissioned</option>
-                            </select>
-                        </td>
-                        <td class="p-3 border-r"><input value="${row.loc}" onchange="dataTab2[${index}].loc=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r"><input value="${row.damage}" onchange="dataTab2[${index}].damage=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r text-right"><input type="number" value="${row.cost}" onchange="dataTab2[${index}].cost=parseFloat(this.value)||0; saveData(); updateDashboard();" class="w-20 text-right bg-transparent border-b"></td>
-                        <td class="p-3 text-center">
-                            <button onclick="confirmDelete('asset', ${index}, '${row.id}')" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 px-2.5 py-1 rounded-md font-semibold transition">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            if (tbody.children.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400 italic">No asset instruments registered. Click "+ Register Asset".</td></tr>`;
-            }
-        }
-
-        function renderTab3() {
-            const tbody = document.getElementById('tbody-tab3');
-            const search = (document.getElementById('search-tab3').value || '').toLowerCase();
-            tbody.innerHTML = '';
-            const today = new Date().toISOString().split('T')[0];
-
-            dataTab3.forEach((row, index) => {
-                if (search && !row.learner.toLowerCase().includes(search) && !row.txn.toLowerCase().includes(search)) return;
-
-                let statusBadge = '';
-                if (row.actual && row.actual.trim() !== '') {
-                    statusBadge = `<span class="badge-green px-2.5 py-1 rounded-full font-bold text-xs">RETURNED</span>`;
-                } else if (row.due && row.due < today) {
-                    statusBadge = `<span class="badge-red px-2.5 py-1 rounded-full font-bold text-xs">OVERDUE</span>`;
-                } else {
-                    statusBadge = `<span class="badge-blue px-2.5 py-1 rounded-full font-bold text-xs">ACTIVE HIRE</span>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 border-r font-mono"><input value="${row.txn}" onchange="dataTab3[${index}].txn=this.value; saveData();" class="w-full bg-transparent"></td>
-                        <td class="p-3 border-r font-semibold">${row.learner}</td>
-                        <td class="p-3 border-r font-mono">${row.asset}</td>
-                        <td class="p-3 border-r"><input type="date" value="${row.dateHired}" onchange="dataTab3[${index}].dateHired=this.value; saveData();" class="w-full"></td>
-                        <td class="p-3 border-r text-center">
-                            <select onchange="dataTab3[${index}].home=this.value; saveData();" class="border rounded-md px-2 py-1 text-xs bg-white shadow-sm">
-                                <option value="Yes" ${row.home === 'Yes' ? 'selected' : ''}>Yes</option>
-                                <option value="No" ${row.home === 'No' ? 'selected' : ''}>No</option>
-                            </select>
-                        </td>
-                        <td class="p-3 border-r"><input type="date" value="${row.due}" onchange="dataTab3[${index}].due=this.value; saveData(); renderTab2(); renderTab3();" class="w-full"></td>
-                        <td class="p-3 border-r"><input type="date" value="${row.actual}" onchange="dataTab3[${index}].actual=this.value; saveData(); renderTab2(); renderTab3();" class="w-full"></td>
-                        <td class="p-3 border-r text-center">${statusBadge}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="confirmDelete('loan', ${index}, '${row.txn}')" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 px-2.5 py-1 rounded-md font-semibold transition">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            if (tbody.children.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-400 italic">No loan transactions logged. Click "+ Log New Loan".</td></tr>`;
-            }
-            syncWorksheets();
-        }
-
-        function renderAllTabs() {
-            renderTab1();
-            renderTab2();
-            renderTab3();
-            updateDashboard();
-        }
-
-        function handleAddLearner(e) {
+        function saveLearner(e) {
             e.preventDefault();
-            const newObj = {
-                id: document.getElementById('form-learner-id').value.trim(),
-                name: document.getElementById('form-learner-name').value.trim(),
-                grade: document.getElementById('form-learner-grade').value.trim(),
-                inst: document.getElementById('form-learner-inst').value.trim(),
-                test: document.getElementById('form-learner-test').value,
-                agreement: document.getElementById('form-learner-agreement').value,
-                storage: document.getElementById('form-learner-storage').value
+            const newLearner = {
+                id: document.getElementById('m-learner-id').value.trim(),
+                name: document.getElementById('m-learner-name').value.trim(),
+                level: document.getElementById('m-learner-level').value,
+                instrument: document.getElementById('m-learner-instrument').value.trim(),
+                qualification: document.getElementById('m-learner-qualification').value,
+                status: document.getElementById('m-learner-status').value
             };
-            dataTab1.push(newObj);
+            dataTab1.push(newLearner);
             saveData();
-            renderTab1();
-            closeModal('modal-add-learner');
-            showToast(`Learner ${newObj.name} added successfully.`);
-            e.target.reset();
+            refreshUI();
+            closeModal('modal-learner');
         }
 
-        function handleAddAsset(e) {
+        function openAssetModal() {
+            document.getElementById('form-asset').reset();
+            openModal('modal-asset');
+        }
+
+        function saveAsset(e) {
             e.preventDefault();
-            const newObj = {
-                id: document.getElementById('form-asset-id').value.trim(),
-                cat: document.getElementById('form-asset-cat').value.trim(),
-                type: document.getElementById('form-asset-type').value.trim(),
-                brand: document.getElementById('form-asset-brand').value.trim(),
-                status: document.getElementById('form-asset-status').value,
-                loc: document.getElementById('form-asset-loc').value.trim(),
-                damage: "None",
-                cost: 0
+            const newAsset = {
+                id: document.getElementById('m-asset-id').value.trim(),
+                category: document.getElementById('m-asset-category').value,
+                brand: document.getElementById('m-asset-brand').value.trim(),
+                model: document.getElementById('m-asset-model').value.trim(),
+                serial: document.getElementById('m-asset-serial').value.trim(),
+                condition: document.getElementById('m-asset-condition').value,
+                status: document.getElementById('m-asset-status').value
             };
-            dataTab2.push(newObj);
+            dataTab2.push(newAsset);
             saveData();
-            renderTab2();
-            closeModal('modal-add-asset');
-            showToast(`Asset ${newObj.id} added successfully.`);
-            e.target.reset();
+            syncWorksheets();
+            refreshUI();
+            closeModal('modal-asset');
         }
 
-        function populateLoanDropdowns() {
-            const learnerSel = document.getElementById('form-loan-learner');
-            const assetSel = document.getElementById('form-loan-asset');
+        function openLoanModal() {
+            const learnerSelect = document.getElementById('m-loan-learner');
+            const assetSelect = document.getElementById('m-loan-asset');
 
-            learnerSel.innerHTML = '';
-            dataTab1.forEach(l => {
-                learnerSel.innerHTML += `<option value="${l.name}">${l.name} (${l.id})</option>`;
-            });
+            learnerSelect.innerHTML = dataTab1.map(l => 
+                `<option value="${l.id}|${escapeHtml(l.name)}">${escapeHtml(l.name)} (${l.id}) - [${l.qualification}]</option>`
+            ).join('');
 
-            assetSel.innerHTML = '';
-            dataTab2.forEach(a => {
-                assetSel.innerHTML += `<option value="${a.id}">${a.id} - ${a.type} [${a.status}]</option>`;
-            });
+            const availAssets = dataTab2.filter(a => a.status === 'Available');
+            if (availAssets.length === 0) {
+                assetSelect.innerHTML = `<option value="">-- No Available Assets --</option>`;
+            } else {
+                assetSelect.innerHTML = availAssets.map(a => 
+                    `<option value="${a.id}">${a.id} - ${escapeHtml(a.brand)} ${escapeHtml(a.model)} (${a.category})</option>`
+                ).join('');
+            }
 
-            document.getElementById('form-loan-hired').value = new Date().toISOString().split('T')[0];
+            document.getElementById('m-loan-id').value = `LN-2026-0${dataTab3.length + 1}`;
+            openModal('modal-loan');
         }
 
-        function handleAddLoan(e) {
+        function saveLoan(e) {
             e.preventDefault();
-            const newObj = {
-                txn: document.getElementById('form-loan-txn').value.trim(),
-                learner: document.getElementById('form-loan-learner').value,
-                asset: document.getElementById('form-loan-asset').value,
-                dateHired: document.getElementById('form-loan-hired').value,
-                home: document.getElementById('form-loan-home').value,
-                due: document.getElementById('form-loan-due').value,
-                actual: ""
+            const learnerVal = document.getElementById('m-loan-learner').value;
+            const assetId = document.getElementById('m-loan-asset').value;
+
+            if (!learnerVal || !assetId) {
+                alert("Please select a valid learner and an available instrument asset.");
+                return;
+            }
+
+            const [learnerId, learnerName] = learnerVal.split('|');
+
+            const newLoan = {
+                id: document.getElementById('m-loan-id').value.trim(),
+                learnerId: learnerId,
+                learnerName: learnerName,
+                assetId: assetId,
+                hireDate: document.getElementById('m-loan-hire-date').value,
+                expectedReturn: document.getElementById('m-loan-return-date').value,
+                status: 'Active',
+                notes: document.getElementById('m-loan-notes').value.trim()
             };
-            dataTab3.push(newObj);
-            saveData();
-            renderTab3();
-            renderTab2();
-            closeModal('modal-add-loan');
-            showToast(`Loan ${newObj.txn} logged successfully.`);
-            e.target.reset();
-        }
 
-        function confirmDelete(type, index, identifier) {
-            document.getElementById('delete-prompt-msg').innerText = `Are you sure you want to delete ${identifier}? This action cannot be undone.`;
-            pendingDeleteFn = () => {
-                if (type === 'learner') dataTab1.splice(index, 1);
-                if (type === 'asset') dataTab2.splice(index, 1);
-                if (type === 'loan') dataTab3.splice(index, 1);
-                saveData();
-                renderAllTabs();
-                closeModal('modal-confirm-delete');
-                showToast(`Record removed.`);
-            };
-            document.getElementById('btn-confirm-delete').onclick = pendingDeleteFn;
-            openModal('modal-confirm-delete');
-        }
-
-        function openResetModal() {
-            openModal('modal-confirm-reset');
-        }
-
-        function executeCleanSlate() {
-            dataTab1 = [];
-            dataTab2 = [];
-            dataTab3 = [];
-            saveData();
-            renderAllTabs();
-            closeModal('modal-confirm-reset');
-            showToast('All demonstration data wiped. You have a clean slate!');
-        }
-
-        function restoreDemoData(showNotification = true) {
-            dataTab1 = JSON.parse(JSON.stringify(DEFAULT_DATA_TAB1));
-            dataTab2 = JSON.parse(JSON.stringify(DEFAULT_DATA_TAB2));
-            dataTab3 = JSON.parse(JSON.stringify(DEFAULT_DATA_TAB3));
-            saveData();
-            renderAllTabs();
-            if (showNotification) showToast('Sample demonstration data loaded.');
-        }
-
-        function updateDashboard() {
+            dataTab3.push(newLoan);
             syncWorksheets();
-            const qualifiedCount = dataTab1.filter(r => r.test === 'Yes' && r.agreement === 'Yes' && r.storage === 'Yes').length;
-            const totalLearners = dataTab1.length;
-            const qualPercent = totalLearners > 0 ? Math.round((qualifiedCount / totalLearners) * 100) : 0;
-
-            const activeHires = dataTab3.filter(r => !r.actual || r.actual.trim() === '').length;
-            const homeLoans = dataTab3.filter(r => (!r.actual || r.actual.trim() === '') && r.home === 'Yes').length;
-
-            const today = new Date().toISOString().split('T')[0];
-            const overdueCount = dataTab3.filter(r => (!r.actual || r.actual.trim() === '') && r.due && r.due < today).length;
-
-            const repairAssets = dataTab2.filter(r => r.status === 'In Repair');
-            const totalRepairCost = repairAssets.reduce((sum, r) => sum + (r.cost || 0), 0);
-
-            document.getElementById('dash-qualified-count').innerText = qualifiedCount;
-            document.getElementById('dash-qualified-rate').innerText = `${qualPercent}% of total roster (${totalLearners})`;
-            document.getElementById('dash-active-count').innerText = activeHires;
-            document.getElementById('dash-home-count').innerText = `${homeLoans} Take-Home Approved`;
-            document.getElementById('dash-overdue-count').innerText = overdueCount;
-            document.getElementById('dash-repair-cost').innerText = `R ${totalRepairCost.toFixed(2)}`;
-            document.getElementById('dash-repair-count').innerText = `${repairAssets.length} assets in repair`;
-
-            document.getElementById('link-total-learners').innerText = totalLearners;
-            document.getElementById('link-qual-learners').innerText = qualifiedCount;
-            document.getElementById('link-total-assets').innerText = dataTab2.length;
-            document.getElementById('link-loan-assets').innerText = dataTab2.filter(r => r.status === 'On Hire').length;
-            document.getElementById('link-repair-assets').innerText = repairAssets.length;
-            document.getElementById('link-repair-total').innerText = `R ${totalRepairCost.toFixed(2)}`;
+            refreshUI();
+            closeModal('modal-loan');
         }
 
-        function exportToExcelWorkbook() {
-            syncWorksheets();
+        // --- SHEETJS EXPORT ---
+        function exportToExcel() {
             const wb = XLSX.utils.book_new();
 
-            const ws1_data = dataTab1.map(r => ({
-                "Learner ID": r.id,
-                "Full Name": r.name,
-                "Grade": r.grade,
-                "Instrument Enrolled": r.inst,
-                "Knowledge Test Passed?": r.test,
-                "Agreement Signed?": r.agreement,
-                "Safe Storage Verified?": r.storage,
-                "Qualification Status": (r.test === "Yes" && r.agreement === "Yes" && r.storage === "Yes") ? "QUALIFIED" : "PENDING"
-            }));
-            const ws1 = XLSX.utils.json_to_sheet(ws1_data);
-            XLSX.utils.book_append_sheet(wb, ws1, "Learner_Qualification");
+            const wsLearners = XLSX.utils.json_to_sheet(dataTab1);
+            const wsAssets = XLSX.utils.json_to_sheet(dataTab2);
+            const wsLoans = XLSX.utils.json_to_sheet(dataTab3);
 
-            const ws2_data = dataTab2.map(r => ({
-                "AMP Asset ID": r.id,
-                "Category": r.cat,
-                "Instrument Type": r.type,
-                "Brand / Serial No": r.brand,
-                "Current Status": r.status,
-                "Storage Location": r.loc,
-                "Damage Description": r.damage,
-                "Est Repair Cost (R)": r.cost
-            }));
-            const ws2 = XLSX.utils.json_to_sheet(ws2_data);
-            XLSX.utils.book_append_sheet(wb, ws2, "Instrument_Asset_Master");
-
-            const today = new Date().toISOString().split('T')[0];
-            const ws3_data = dataTab3.map(r => {
-                let st = "ACTIVE";
-                if (r.actual && r.actual.trim() !== '') st = "RETURNED";
-                else if (r.due && r.due < today) st = "OVERDUE";
-                return {
-                    "Txn ID": r.txn,
-                    "Learner Name": r.learner,
-                    "AMP Asset ID": r.asset,
-                    "Date Hired": r.dateHired,
-                    "Home Approved?": r.home,
-                    "Return Due Date": r.due,
-                    "Actual Return Date": r.actual,
-                    "Loan Status": st
-                };
-            });
-            const ws3 = XLSX.utils.json_to_sheet(ws3_data);
-            XLSX.utils.book_append_sheet(wb, ws3, "Active_Hires_Log");
-
-            const qualifiedCount = dataTab1.filter(r => r.test === 'Yes' && r.agreement === 'Yes' && r.storage === 'Yes').length;
-            const activeHires = dataTab3.filter(r => !r.actual || r.actual.trim() === '').length;
-            const overdueCount = dataTab3.filter(r => (!r.actual || r.actual.trim() === '') && r.due && r.due < today).length;
-            const repairAssets = dataTab2.filter(r => r.status === 'In Repair');
-            const totalRepairCost = repairAssets.reduce((sum, r) => sum + (r.cost || 0), 0);
-
-            const ws4_data = [
-                ["ACCESS MUSIC PROJECT (AMP) - PM EXECUTIVE DASHBOARD SUMMARY"],
-                [],
-                ["Metric Name", "Calculated Value", "Formula Reference"],
-                ["Total Enrolled Learners", dataTab1.length, '=COUNTA(Learner_Qualification!A2:A100)'],
-                ["Qualified Learners", qualifiedCount, '=COUNTIF(Learner_Qualification!H2:H100, "QUALIFIED")'],
-                ["Total Fleet Assets", dataTab2.length, '=COUNTA(Instrument_Asset_Master!A2:A100)'],
-                ["Assets Currently On Hire", dataTab2.filter(r => r.status === 'On Hire').length, '=COUNTIF(Instrument_Asset_Master!E2:E100, "On Hire")'],
-                ["Active Loans Count", activeHires, '=COUNTIF(Active_Hires_Log!H2:H100, "ACTIVE")'],
-                ["Overdue Loans Count", overdueCount, '=COUNTIF(Active_Hires_Log!H2:H100, "OVERDUE")'],
-                ["Assets In Repair Rack", repairAssets.length, '=COUNTIF(Instrument_Asset_Master!E2:E100, "In Repair")'],
-                ["Est Total Repair Overhead (R)", totalRepairCost, '=SUMIF(Instrument_Asset_Master!E2:E100, "In Repair", Instrument_Asset_Master!H2:H100)']
+            const summaryData = [
+                { Metric: "Total Learners Registered", Value: dataTab1.length },
+                { Metric: "Total Instrument Assets", Value: dataTab2.length },
+                { Metric: "Active Loans Outstanding", Value: dataTab3.filter(l => l.status === 'Active').length },
+                { Metric: "Assets Available in Storage", Value: dataTab2.filter(a => a.status === 'Available').length },
+                { Metric: "Assets In Repair", Value: dataTab2.filter(a => a.status === 'In Repair').length }
             ];
-            const ws4 = XLSX.utils.aoa_to_sheet(ws4_data);
-            XLSX.utils.book_append_sheet(wb, ws4, "PM_Dashboard");
+            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
 
-            XLSX.writeFile(wb, "AMP_Clean_Instrument_Hire_Tracker.xlsx");
+            XLSX.utils.book_append_sheet(wb, wsLearners, "Learner Roster");
+            XLSX.utils.book_append_sheet(wb, wsAssets, "Instrument Assets");
+            XLSX.utils.book_append_sheet(wb, wsLoans, "Loan Log");
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Executive Summary");
+
+            XLSX.writeFile(wb, "AMP_Instrument_Tracking_System.xlsx");
         }
 
-        // Initialize Application on Window Load
-        window.onload = function() {
-            initApp();
-        };
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('DOMContentLoaded', initData);
     </script>
 </body>
 </html>
