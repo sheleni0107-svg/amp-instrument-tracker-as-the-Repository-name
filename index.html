@@ -3,78 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Access Music Project - Instrument Hire & Asset Management System</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Access Music Project (AMP) - Multi-Tab Instrument Tracker</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS for Excel Export -->
+    <!-- SheetJS for XLSX Export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-indigo-900 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- App Header -->
+    <header class="bg-slate-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-music text-amber-400 text-2xl"></i>
+                <i class="fa-solid fa-music text-indigo-400 text-2xl"></i>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">Access Music Project (AMP)</h1>
-                    <p class="text-xs text-indigo-200">Instrument Hire & Asset Management System</p>
+                    <h1 class="text-xl font-bold tracking-tight uppercase">Access Music Project (AMP)</h1>
+                    <p class="text-xs text-slate-400">Integrated Multi-Tab Instrument Hire & Asset Management System</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="exportToExcelWorkbook()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-3 py-2 rounded-lg transition flex items-center gap-2 shadow">
-                    <i class="fa-solid fa-file-excel"></i> Export Workbook
+            <div class="flex items-center space-x-2 text-xs">
+                <button onclick="clearSystemData()" class="bg-rose-950/60 border border-rose-700/50 hover:bg-rose-900 text-rose-200 px-3 py-2 rounded transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash"></i> Clear Demo Data / Clean Slate
                 </button>
-                <button onclick="openResetModal()" class="bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium px-3 py-2 rounded-lg transition flex items-center gap-2 shadow">
-                    <i class="fa-solid fa-rotate-left"></i> Reset System
+                <button onclick="loadSampleData()" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate-left"></i> Load Sample Data
+                </button>
+                <button onclick="exportWorkbook()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded font-semibold transition flex items-center gap-1.5 shadow">
+                    <i class="fa-solid fa-file-excel"></i> Download Excel (.XLSX)
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
-        
-        <!-- Tab Controls -->
-        <div class="border-b border-slate-300 mb-6">
-            <nav class="flex space-x-4" aria-label="Tabs">
-                <button id="tab-btn-1" onclick="switchTab(1)" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 flex items-center gap-2">
-                    <i class="fa-solid fa-graduation-cap"></i> Learner Roster
+    <!-- Main Navigation Bar -->
+    <div class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <nav class="flex space-x-6 text-xs font-semibold overflow-x-auto py-3" aria-label="Tabs">
+                <button id="tab-btn-1" onclick="switchTab(1)" class="tab-btn text-indigo-600 border-b-2 border-indigo-600 pb-1 flex items-center gap-1.5 whitespace-nowrap">
+                    <span class="inline-block w-2 h-2 rounded-full bg-indigo-600"></span> 1. Learner Qualification Roster
                 </button>
-                <button id="tab-btn-2" onclick="switchTab(2)" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2">
-                    <i class="fa-solid fa-boxes-stacked"></i> Asset Inventory
+                <button id="tab-btn-2" onclick="switchTab(2)" class="tab-btn text-slate-500 hover:text-slate-800 pb-1 flex items-center gap-1.5 whitespace-nowrap">
+                    <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span> 2. Instrument Asset Master
                 </button>
-                <button id="tab-btn-3" onclick="switchTab(3)" class="tab-btn py-3 px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-2">
-                    <i class="fa-solid fa-handshake-angle"></i> Loan Registry
+                <button id="tab-btn-3" onclick="switchTab(3)" class="tab-btn text-slate-500 hover:text-slate-800 pb-1 flex items-center gap-1.5 whitespace-nowrap">
+                    <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span> 3. Active Hires Log
+                </button>
+                <button id="tab-btn-4" onclick="switchTab(4)" class="tab-btn text-slate-500 hover:text-slate-800 pb-1 flex items-center gap-1.5 whitespace-nowrap">
+                    <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span> 4. Executive PM Dashboard
+                </button>
+                <button id="tab-btn-5" onclick="switchTab(5)" class="tab-btn text-slate-500 hover:text-slate-800 pb-1 flex items-center gap-1.5 whitespace-nowrap">
+                    <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span> 5. Deployment Guide
                 </button>
             </nav>
         </div>
+    </div>
 
-        <!-- Tab 1: Learner Roster -->
+    <!-- Main Content Worksheets -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- Worksheet 1: Learner Qualification Roster -->
         <section id="tab-content-1" class="tab-page space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div class="relative w-full sm:w-72">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
-                    <input type="text" id="search-tab1" oninput="renderTab1()" placeholder="Search learners..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900">Worksheet 1: Learner Qualification Roster</h2>
+                        <p class="text-xs text-slate-500">3-Gate Criteria: Learner is <span class="font-semibold text-emerald-600">QUALIFIED</span> only when Knowledge Test, Agreement, and Safe Storage are all marked "Yes".</p>
+                    </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <input type="text" id="search-tab1" oninput="renderTab1()" placeholder="Search learner..." class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg w-full md:w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <button onclick="openAddLearnerModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap transition">
+                            + Add Learner
+                        </button>
+                    </div>
                 </div>
-                <button onclick="openModal('modal-add-learner')" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-user-plus"></i> Add New Learner
-                </button>
-            </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 uppercase text-xs font-bold tracking-wider">
-                            <tr>
-                                <th class="p-4">Learner ID</th>
-                                <th class="p-4">Full Name</th>
-                                <th class="p-4">Grade / Level</th>
-                                <th class="p-4">Contact</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-right">Actions</th>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 border-y border-slate-200 font-bold uppercase tracking-wider">
+                                <th class="p-3">Learner ID</th>
+                                <th class="p-3">Full Name</th>
+                                <th class="p-3">Grade</th>
+                                <th class="p-3">Instrument Enrolled</th>
+                                <th class="p-3">Test Passed?</th>
+                                <th class="p-3">Agreement Signed?</th>
+                                <th class="p-3">Storage Verified?</th>
+                                <th class="p-3">Qualification Status</th>
+                                <th class="p-3 text-center">Admin Action</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-tab1" class="divide-y divide-slate-200"></tbody>
@@ -83,31 +100,21 @@
             </div>
         </section>
 
-        <!-- Tab 2: Asset Inventory -->
+        <!-- Worksheet 2: Instrument Asset Master -->
         <section id="tab-content-2" class="tab-page hidden space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div class="relative w-full sm:w-72">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
-                    <input type="text" id="search-tab2" oninput="renderTab2()" placeholder="Search instruments/assets..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <button onclick="openModal('modal-add-asset')" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Add New Asset
-                </button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-900 mb-2">Worksheet 2: Instrument Asset Master</h2>
+                <p class="text-xs text-slate-500 mb-4">Complete physical inventory records of instruments, condition checks, and storage locations.</p>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 uppercase text-xs font-bold tracking-wider">
-                            <tr>
-                                <th class="p-4">Asset ID</th>
-                                <th class="p-4">Category</th>
-                                <th class="p-4">Type</th>
-                                <th class="p-4">Brand / Model</th>
-                                <th class="p-4">Location</th>
-                                <th class="p-4">Condition</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-right">Actions</th>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 border-y border-slate-200 font-bold uppercase">
+                                <th class="p-3">Asset Code</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Instrument Type</th>
+                                <th class="p-3">Brand & Model</th>
+                                <th class="p-3">Condition</th>
+                                <th class="p-3">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-tab2" class="divide-y divide-slate-200"></tbody>
@@ -116,30 +123,21 @@
             </div>
         </section>
 
-        <!-- Tab 3: Loan Registry -->
+        <!-- Worksheet 3: Active Hires Log -->
         <section id="tab-content-3" class="tab-page hidden space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div class="relative w-full sm:w-72">
-                    <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400"></i>
-                    <input type="text" id="search-tab3" oninput="renderTab3()" placeholder="Search loan history..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <button onclick="openModal('modal-add-loan')" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-hand-holding-hand"></i> Issue New Loan
-                </button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-900 mb-2">Worksheet 3: Active Hires Log</h2>
+                <p class="text-xs text-slate-500 mb-4">Tracking checked-out instruments and learner assignment records.</p>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-600 border-b border-slate-200 uppercase text-xs font-bold tracking-wider">
-                            <tr>
-                                <th class="p-4">Loan ID</th>
-                                <th class="p-4">Asset ID</th>
-                                <th class="p-4">Learner Name</th>
-                                <th class="p-4">Issue Date</th>
-                                <th class="p-4">Due Date</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-right">Actions</th>
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 border-y border-slate-200 font-bold uppercase">
+                                <th class="p-3">Hire ID</th>
+                                <th class="p-3">Asset Code</th>
+                                <th class="p-3">Learner ID</th>
+                                <th class="p-3">Checkout Date</th>
+                                <th class="p-3">Expected Return</th>
+                                <th class="p-3">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-tab3" class="divide-y divide-slate-200"></tbody>
@@ -148,382 +146,225 @@
             </div>
         </section>
 
+        <!-- Worksheet 4: Executive PM Dashboard -->
+        <section id="tab-content-4" class="tab-page hidden space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-900 mb-4">Worksheet 4: Executive PM Dashboard</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-lg">
+                        <div class="text-xs font-semibold text-indigo-700 uppercase">Total Learners</div>
+                        <div id="dash-learners" class="text-2xl font-bold text-indigo-900 mt-1">0</div>
+                    </div>
+                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-lg">
+                        <div class="text-xs font-semibold text-emerald-700 uppercase">Qualified Learners</div>
+                        <div id="dash-qualified" class="text-2xl font-bold text-emerald-900 mt-1">0</div>
+                    </div>
+                    <div class="p-4 bg-amber-50 border border-amber-100 rounded-lg">
+                        <div class="text-xs font-semibold text-amber-700 uppercase">Pending Qualifications</div>
+                        <div id="dash-pending" class="text-2xl font-bold text-amber-900 mt-1">0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Worksheet 5: Deployment Guide -->
+        <section id="tab-content-5" class="tab-page hidden space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-3">
+                <h2 class="text-base font-bold text-slate-900">Worksheet 5: Deployment & User Guide</h2>
+                <p class="text-xs text-slate-600">This web app stores all records in browser local storage. Data exports can be generated anytime via the <strong>Download Excel (.XLSX)</strong> button.</p>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Modal: Add Learner -->
-    <div id="modal-add-learner" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Add Learner</h3>
-            <form onsubmit="handleAddLearner(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Learner ID</label>
-                    <input type="text" id="m-learner-id" required placeholder="LNR-101" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Full Name</label>
-                    <input type="text" id="m-learner-name" required placeholder="Sipho Ndlovu" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Grade / Level</label>
-                    <input type="text" id="m-learner-grade" required placeholder="Grade 10" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Contact Email / Phone</label>
-                    <input type="text" id="m-learner-contact" required placeholder="sipho@example.com" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-add-learner')" class="px-4 py-2 border text-slate-600 rounded-lg text-sm hover:bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">Save Learner</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Add Asset -->
-    <div id="modal-add-asset" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Add Asset</h3>
-            <form onsubmit="handleAddAsset(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Asset ID</label>
-                    <input type="text" id="m-asset-id" required placeholder="AMP-PWC-012" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Category</label>
-                    <input type="text" id="m-asset-cat" required placeholder="Penny whistle" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Instrument Type</label>
-                    <input type="text" id="m-asset-type" required placeholder="Penny Whistle in C" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Brand / Model</label>
-                    <input type="text" id="m-asset-brand" required placeholder="Clarke Original" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Location</label>
-                    <input type="text" id="m-asset-loc" required placeholder="Storage Room A" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Condition / Damage</label>
-                    <input type="text" id="m-asset-damage" required placeholder="Good condition" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-add-asset')" class="px-4 py-2 border text-slate-600 rounded-lg text-sm hover:bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">Save Asset</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Add Loan -->
-    <div id="modal-add-loan" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Issue Loan</h3>
-            <form onsubmit="handleAddLoan(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Loan ID</label>
-                    <input type="text" id="m-loan-id" required placeholder="LN-2026-001" class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Asset ID</label>
-                    <select id="m-loan-asset-id" required class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Learner Name</label>
-                    <select id="m-loan-learner-name" required class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Issue Date</label>
-                    <input type="date" id="m-loan-date" required class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Due Date</label>
-                    <input type="date" id="m-loan-due" required class="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-add-loan')" class="px-4 py-2 border text-slate-600 rounded-lg text-sm hover:bg-slate-100">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700">Issue Loan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal: Reset System -->
-    <div id="modal-reset" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 class="text-lg font-bold text-rose-600 flex items-center gap-2">
-                <i class="fa-solid fa-triangle-exclamation"></i> System Reset Options
-            </h3>
-            <p class="text-sm text-slate-600">Choose whether to restore initial demo seed data or purge all records for a clean slate.</p>
-            <div class="flex flex-col space-y-2 pt-2">
-                <button onclick="restoreDemoData()" class="w-full bg-slate-800 hover:bg-slate-900 text-white p-2.5 rounded-lg text-sm font-medium transition">
-                    Restore Default Seed Data
-                </button>
-                <button onclick="executeCleanSlate()" class="w-full bg-rose-600 hover:bg-rose-700 text-white p-2.5 rounded-lg text-sm font-medium transition">
-                    Clear All Local Data (Clean Slate)
-                </button>
-                <button onclick="closeModal('modal-reset')" class="w-full border border-slate-300 text-slate-600 p-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Application JavaScript -->
+    <!-- Application JavaScript Logic -->
     <script>
-        // Seed Datasets
-        const DEFAULT_DATA_TAB1 = [
-            { id: "LNR-001", name: "Thabo Mbeki", grade: "Grade 10", contact: "thabo@amp.org.za", status: "Active" },
-            { id: "LNR-002", name: "Avela Nene", grade: "Grade 11", contact: "avela@amp.org.za", status: "Active" },
-            { id: "LNR-003", name: "Siphesihle Zondi", grade: "Grade 12", contact: "siphe@amp.org.za", status: "Inactive" }
+        const INITIAL_LEARNERS = [
+            { id: "L001", name: "Sipho Ndlovu", grade: "Grade 10", instrument: "Violin", test: "Yes", agreement: "Yes", storage: "Yes" },
+            { id: "L002", name: "Thandiwe Khumalo", grade: "Grade 11", instrument: "Alto Saxophone", test: "Yes", agreement: "Yes", storage: "Yes" },
+            { id: "L003", name: "Buhle Mokoena", grade: "Grade 9", instrument: "Cello", test: "Yes", agreement: "No", storage: "Yes" },
+            { id: "L004", name: "Lwandle Dlamini", grade: "Grade 12", instrument: "Trumpet", test: "No", agreement: "No", storage: "No" },
+            { id: "L005", name: "Kamvalethu Botha", grade: "Grade 10", instrument: "Bass Guitar", test: "Yes", agreement: "Yes", storage: "Yes" }
         ];
 
-        const DEFAULT_DATA_TAB2 = [
-            { id: "AMP-PWC-011", cat: "Penny whistle", type: "Penny Whistle", brand: "Clarke Original", status: "Available", loc: "Storage Room", damage: "None", cost: 250 },
-            { id: "AMP-SAX-002", cat: "Woodwind", type: "Alto Saxophone", brand: "Yamaha YAS-280", status: "Loaned", loc: "On Loan", damage: "Minor Scratches", cost: 12000 },
-            { id: "AMP-GTR-005", cat: "Strings", type: "Acoustic Guitar", brand: "Cort AF510", status: "Available", loc: "Main Studio", damage: "None", cost: 2200 }
+        const INITIAL_ASSETS = [
+            { id: "AMP-VLN-001", cat: "Strings", type: "Violin 4/4", brand: "Strunal", condition: "Good", status: "Available" },
+            { id: "AMP-SAX-002", cat: "Woodwind", type: "Alto Saxophone", brand: "Yamaha", condition: "Good", status: "On Loan" },
+            { id: "AMP-PWC-011", cat: "Penny whistle", type: "Penny Whistle", brand: "Clarke Original", condition: "Good", status: "Available" }
         ];
 
-        const DEFAULT_DATA_TAB3 = [
-            { id: "LN-2026-001", assetId: "AMP-SAX-002", learnerName: "Avela Nene", issueDate: "2026-09-01", dueDate: "2026-11-30", status: "Active" }
+        const INITIAL_HIRES = [
+            { id: "HIR-2026-01", assetId: "AMP-SAX-002", learnerId: "L002", outDate: "2026-08-01", returnDate: "2026-11-30", status: "Active" }
         ];
 
-        // State Initialization
-        let dataTab1 = JSON.parse(localStorage.getItem('amp_tab1')) || DEFAULT_DATA_TAB1;
-        let dataTab2 = JSON.parse(localStorage.getItem('amp_tab2')) || DEFAULT_DATA_TAB2;
-        let dataTab3 = JSON.parse(localStorage.getItem('amp_tab3')) || DEFAULT_DATA_TAB3;
+        let learners = JSON.parse(localStorage.getItem('amp_learners')) || INITIAL_LEARNERS;
+        let assets = JSON.parse(localStorage.getItem('amp_assets')) || INITIAL_ASSETS;
+        let hires = JSON.parse(localStorage.getItem('amp_hires')) || INITIAL_HIRES;
 
-        function saveData() {
-            localStorage.setItem('amp_tab1', JSON.stringify(dataTab1));
-            localStorage.setItem('amp_tab2', JSON.stringify(dataTab2));
-            localStorage.setItem('amp_tab3', JSON.stringify(dataTab3));
+        function persistData() {
+            localStorage.setItem('amp_learners', JSON.stringify(learners));
+            localStorage.setItem('amp_assets', JSON.stringify(assets));
+            localStorage.setItem('amp_hires', JSON.stringify(hires));
         }
 
-        // Tab Navigation
         function switchTab(tabNum) {
-            document.querySelectorAll('.tab-page').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-indigo-600', 'text-indigo-600');
-                el.classList.add('border-transparent', 'text-slate-500');
+            document.querySelectorAll('.tab-page').forEach(page => page.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600');
+                btn.classList.add('text-slate-500');
             });
 
             document.getElementById(`tab-content-${tabNum}`).classList.remove('hidden');
             const activeBtn = document.getElementById(`tab-btn-${tabNum}`);
-            activeBtn.classList.remove('border-transparent', 'text-slate-500');
-            activeBtn.classList.add('border-indigo-600', 'text-indigo-600');
+            activeBtn.classList.remove('text-slate-500');
+            activeBtn.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600');
         }
 
-        // Render Tables
         function renderTab1() {
-            const query = (document.getElementById('search-tab1').value || '').toLowerCase();
+            const query = (document.getElementById('search-tab1')?.value || '').toLowerCase();
             const tbody = document.getElementById('tbody-tab1');
             tbody.innerHTML = '';
 
-            dataTab1.filter(item => item.name.toLowerCase().includes(query) || item.id.toLowerCase().includes(query))
-                .forEach(item => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 font-mono text-xs font-bold text-slate-700">${item.id}</td>
-                            <td class="p-4 font-semibold text-slate-800">${item.name}</td>
-                            <td class="p-4">${item.grade}</td>
-                            <td class="p-4 text-slate-600">${item.contact}</td>
-                            <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${item.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}">${item.status}</span></td>
-                            <td class="p-4 text-right">
-                                <button onclick="deleteItem(1, '${item.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
-                            </td>
-                        </tr>`;
-                });
+            learners.filter(l => l.name.toLowerCase().includes(query) || l.id.toLowerCase().includes(query)).forEach((l, index) => {
+                const isQualified = l.test === 'Yes' && l.agreement === 'Yes' && l.storage === 'Yes';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-mono font-medium text-slate-600">${l.id}</td>
+                        <td class="p-3 font-semibold text-slate-800">${l.name}</td>
+                        <td class="p-3 text-slate-600">${l.grade}</td>
+                        <td class="p-3 text-slate-600">${l.instrument}</td>
+                        <td class="p-3">
+                            <select onchange="updateGate(${index}, 'test', this.value)" class="border rounded px-1 py-0.5 text-xs bg-white">
+                                <option value="Yes" ${l.test === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${l.test === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3">
+                            <select onchange="updateGate(${index}, 'agreement', this.value)" class="border rounded px-1 py-0.5 text-xs bg-white">
+                                <option value="Yes" ${l.agreement === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${l.agreement === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3">
+                            <select onchange="updateGate(${index}, 'storage', this.value)" class="border rounded px-1 py-0.5 text-xs bg-white">
+                                <option value="Yes" ${l.storage === 'Yes' ? 'selected' : ''}>Yes</option>
+                                <option value="No" ${l.storage === 'No' ? 'selected' : ''}>No</option>
+                            </select>
+                        </td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${isQualified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                ${isQualified ? 'QUALIFIED' : 'PENDING'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteLearner(${index})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-2 py-0.5 rounded text-[11px] font-medium">Delete</button>
+                        </td>
+                    </tr>`;
+            });
+            updateDashboard();
         }
 
         function renderTab2() {
-            const query = (document.getElementById('search-tab2').value || '').toLowerCase();
             const tbody = document.getElementById('tbody-tab2');
             tbody.innerHTML = '';
-
-            dataTab2.filter(item => item.id.toLowerCase().includes(query) || item.brand.toLowerCase().includes(query) || item.type.toLowerCase().includes(query))
-                .forEach(item => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 font-mono text-xs font-bold text-indigo-700">${item.id}</td>
-                            <td class="p-4">${item.cat}</td>
-                            <td class="p-4 font-medium text-slate-800">${item.type}</td>
-                            <td class="p-4 text-slate-600">${item.brand}</td>
-                            <td class="p-4">${item.loc}</td>
-                            <td class="p-4 text-slate-500 text-xs">${item.damage}</td>
-                            <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${item.status === 'Available' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${item.status}</span></td>
-                            <td class="p-4 text-right">
-                                <button onclick="deleteItem(2, '${item.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
-                            </td>
-                        </tr>`;
-                });
+            assets.forEach(a => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-mono font-medium text-indigo-700">${a.id}</td>
+                        <td class="p-3">${a.cat}</td>
+                        <td class="p-3 font-semibold text-slate-800">${a.type}</td>
+                        <td class="p-3">${a.brand}</td>
+                        <td class="p-3 text-slate-600">${a.condition}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${a.status === 'Available' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${a.status}</span></td>
+                    </tr>`;
+            });
         }
 
         function renderTab3() {
-            const query = (document.getElementById('search-tab3').value || '').toLowerCase();
             const tbody = document.getElementById('tbody-tab3');
             tbody.innerHTML = '';
-
-            dataTab3.filter(item => item.id.toLowerCase().includes(query) || item.learnerName.toLowerCase().includes(query) || item.assetId.toLowerCase().includes(query))
-                .forEach(item => {
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 font-mono text-xs font-bold text-slate-700">${item.id}</td>
-                            <td class="p-4 font-mono text-xs text-indigo-600 font-semibold">${item.assetId}</td>
-                            <td class="p-4 font-medium text-slate-800">${item.learnerName}</td>
-                            <td class="p-4">${item.issueDate}</td>
-                            <td class="p-4">${item.dueDate}</td>
-                            <td class="p-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${item.status === 'Active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'}">${item.status}</span></td>
-                            <td class="p-4 text-right space-x-2">
-                                ${item.status === 'Active' ? `<button onclick="returnLoan('${item.id}')" class="text-emerald-600 hover:text-emerald-800 text-xs font-semibold"><i class="fa-solid fa-check"></i> Mark Returned</button>` : ''}
-                                <button onclick="deleteItem(3, '${item.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
-                            </td>
-                        </tr>`;
-                });
-        }
-
-        // Modal Utilities
-        function openModal(modalId) {
-            if (modalId === 'modal-add-loan') {
-                const assetSelect = document.getElementById('m-loan-asset-id');
-                const learnerSelect = document.getElementById('m-loan-learner-name');
-                assetSelect.innerHTML = dataTab2.filter(a => a.status === 'Available').map(a => `<option value="${a.id}">${a.id} - ${a.type} (${a.brand})</option>`).join('') || `<option disabled>No Available Assets</option>`;
-                learnerSelect.innerHTML = dataTab1.map(l => `<option value="${l.name}">${l.name} (${l.id})</option>`).join('');
-            }
-            document.getElementById(modalId).classList.remove('hidden');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function openResetModal() {
-            openModal('modal-reset');
-        }
-
-        // Handlers
-        function handleAddLearner(e) {
-            e.preventDefault();
-            dataTab1.push({
-                id: document.getElementById('m-learner-id').value,
-                name: document.getElementById('m-learner-name').value,
-                grade: document.getElementById('m-learner-grade').value,
-                contact: document.getElementById('m-learner-contact').value,
-                status: 'Active'
+            hires.forEach(h => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-mono font-medium text-slate-700">${h.id}</td>
+                        <td class="p-3 font-mono text-indigo-600">${h.assetId}</td>
+                        <td class="p-3">${h.learnerId}</td>
+                        <td class="p-3">${h.outDate}</td>
+                        <td class="p-3">${h.returnDate}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">${h.status}</span></td>
+                    </tr>`;
             });
-            saveData();
+        }
+
+        function updateGate(index, gateField, value) {
+            learners[index][gateField] = value;
+            persistData();
             renderTab1();
-            closeModal('modal-add-learner');
-            e.target.reset();
         }
 
-        function handleAddAsset(e) {
-            e.preventDefault();
-            dataTab2.push({
-                id: document.getElementById('m-asset-id').value,
-                cat: document.getElementById('m-asset-cat').value,
-                type: document.getElementById('m-asset-type').value,
-                brand: document.getElementById('m-asset-brand').value,
-                loc: document.getElementById('m-asset-loc').value,
-                damage: document.getElementById('m-asset-damage').value,
-                status: 'Available',
-                cost: 0
-            });
-            saveData();
-            renderTab2();
-            closeModal('modal-add-asset');
-            e.target.reset();
-        }
-
-        function handleAddLoan(e) {
-            e.preventDefault();
-            const assetId = document.getElementById('m-loan-asset-id').value;
-            const loanId = document.getElementById('m-loan-id').value;
-
-            if (!assetId) return alert('Please select a valid available asset.');
-
-            dataTab3.push({
-                id: loanId,
-                assetId: assetId,
-                learnerName: document.getElementById('m-loan-learner-name').value,
-                issueDate: document.getElementById('m-loan-date').value,
-                dueDate: document.getElementById('m-loan-due').value,
-                status: 'Active'
-            });
-
-            // Update Asset status to Loaned
-            const asset = dataTab2.find(a => a.id === assetId);
-            if (asset) asset.status = 'Loaned';
-
-            saveData();
-            renderTab2();
-            renderTab3();
-            closeModal('modal-add-loan');
-            e.target.reset();
-        }
-
-        function returnLoan(loanId) {
-            const loan = dataTab3.find(l => l.id === loanId);
-            if (loan) {
-                loan.status = 'Returned';
-                const asset = dataTab2.find(a => a.id === loan.assetId);
-                if (asset) asset.status = 'Available';
-                saveData();
-                renderTab2();
-                renderTab3();
+        function deleteLearner(index) {
+            if (confirm('Delete this learner record?')) {
+                learners.splice(index, 1);
+                persistData();
+                renderTab1();
             }
         }
 
-        function deleteItem(tabNum, id) {
-            if (!confirm(`Are you sure you want to delete record ${id}?`)) return;
-            if (tabNum === 1) dataTab1 = dataTab1.filter(i => i.id !== id);
-            if (tabNum === 2) dataTab2 = dataTab2.filter(i => i.id !== id);
-            if (tabNum === 3) dataTab3 = dataTab3.filter(i => i.id !== id);
-            saveData();
+        function updateDashboard() {
+            const total = learners.length;
+            const qualified = learners.filter(l => l.test === 'Yes' && l.agreement === 'Yes' && l.storage === 'Yes').length;
+            document.getElementById('dash-learners').textContent = total;
+            document.getElementById('dash-qualified').textContent = qualified;
+            document.getElementById('dash-pending').textContent = total - qualified;
+        }
+
+        function openAddLearnerModal() {
+            const id = prompt("Enter Learner ID (e.g. L006):");
+            if (!id) return;
+            const name = prompt("Enter Learner Full Name:");
+            if (!name) return;
+            const grade = prompt("Enter Grade (e.g. Grade 10):");
+            const instrument = prompt("Enter Enrolled Instrument:");
+
+            learners.push({ id, name, grade: grade || 'Grade 10', instrument: instrument || 'Unassigned', test: 'No', agreement: 'No', storage: 'No' });
+            persistData();
             renderTab1();
-            renderTab2();
-            renderTab3();
         }
 
-        function restoreDemoData() {
-            dataTab1 = [...DEFAULT_DATA_TAB1];
-            dataTab2 = [...DEFAULT_DATA_TAB2];
-            dataTab3 = [...DEFAULT_DATA_TAB3];
-            saveData();
+        function loadSampleData() {
+            learners = [...INITIAL_LEARNERS];
+            assets = [...INITIAL_ASSETS];
+            hires = [...INITIAL_HIRES];
+            persistData();
             renderAll();
-            closeModal('modal-reset');
         }
 
-        function executeCleanSlate() {
-            dataTab1 = [];
-            dataTab2 = [];
-            dataTab3 = [];
-            saveData();
-            renderAll();
-            closeModal('modal-reset');
+        function clearSystemData() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                learners = [];
+                assets = [];
+                hires = [];
+                persistData();
+                renderAll();
+            }
         }
 
         function renderAll() {
             renderTab1();
             renderTab2();
             renderTab3();
+            updateDashboard();
         }
 
-        function exportToExcelWorkbook() {
+        function exportWorkbook() {
             const wb = XLSX.utils.book_new();
-            
-            const ws1 = XLSX.utils.json_to_sheet(dataTab1);
-            const ws2 = XLSX.utils.json_to_sheet(dataTab2);
-            const ws3 = XLSX.utils.json_to_sheet(dataTab3);
-
-            XLSX.utils.book_append_sheet(wb, ws1, "Learner Roster");
-            XLSX.utils.book_append_sheet(wb, ws2, "Asset Inventory");
-            XLSX.utils.book_append_sheet(wb, ws3, "Loan Registry");
-
-            XLSX.writeFile(wb, "AMP_Asset_Management_Export.xlsx");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(learners), "Learner Roster");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(assets), "Asset Master");
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(hires), "Active Hires");
+            XLSX.writeFile(wb, "AMP_System_Report.xlsx");
         }
 
-        // Initial Load
+        // Initialize on Load
         renderAll();
     </script>
 </body>
