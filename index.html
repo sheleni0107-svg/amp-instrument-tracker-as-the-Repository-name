@@ -151,7 +151,7 @@
             <div class="bg-white p-5 rounded-xl border border-slate-200 card-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h2 class="text-base font-bold text-slate-900">Worksheet 3: Active Hires & Loan Transaction Log</h2>
-                    <p class="text-xs text-slate-500">Cross-references qualified learners and assets. Overdue loans automatically flag red if today passes return due date.</p>
+                    <p class="text-xs text-slate-500">Cross-references qualified learners and assets. <strong class="text-rose-600">Restricted:</strong> Only learners with QUALIFIED status can be logged here.</p>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <input type="text" id="search-tab3" oninput="renderTab3()" placeholder="Search loan/learner..." class="px-3 py-1.5 text-xs border rounded-lg w-full sm:w-48 bg-slate-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500">
@@ -418,10 +418,11 @@
                     <input id="form-loan-txn" required type="text" placeholder="TXN-101" class="w-full border rounded-lg p-2 bg-slate-50">
                 </div>
                 <div>
-                    <label class="block font-semibold mb-1">Learner Name</label>
+                    <label class="block font-semibold mb-1">Learner Name (Qualified Only)</label>
                     <select id="form-loan-learner" class="w-full border rounded-lg p-2 bg-white" required>
                         <!-- Dynamic options -->
                     </select>
+                    <p id="learner-restriction-note" class="text-2xs text-rose-600 mt-1 hidden">⚠️ Note: Learners marked PENDING are automatically excluded until all 3 qualification gates are met.</p>
                 </div>
                 <div>
                     <label class="block font-semibold mb-1">AMP Asset ID</label>
@@ -534,11 +535,14 @@
             updateDashboard();
         }
 
-        function showToast(msg) {
+        function showToast(msg, isError = false) {
             const banner = document.getElementById('toast-banner');
+            banner.className = isError 
+                ? "bg-rose-600 text-white text-xs py-2 px-4 text-center font-semibold transition-all"
+                : "bg-emerald-600 text-white text-xs py-2 px-4 text-center font-semibold transition-all";
             document.getElementById('toast-msg').innerText = msg;
             banner.classList.remove('hidden');
-            setTimeout(() => banner.classList.add('hidden'), 3000);
+            setTimeout(() => banner.classList.add('hidden'), 3500);
         }
 
         function switchTab(tabNum) {
@@ -778,11 +782,24 @@
         function populateLoanDropdowns() {
             const learnerSel = document.getElementById('form-loan-learner');
             const assetSel = document.getElementById('form-loan-asset');
+            const restrictionNote = document.getElementById('learner-restriction-note');
 
             learnerSel.innerHTML = '';
-            dataTab1.forEach(l => {
-                learnerSel.innerHTML += `<option value="${l.name}">${l.name} (${l.id})</option>`;
-            });
+            
+            // RESTRICTION ENFORCEMENT: Filter learners to only include fully QUALIFIED ones
+            const qualifiedLearners = dataTab1.filter(l => l.test === "Yes" && l.agreement === "Yes" && l.storage === "Yes");
+
+            if (qualifiedLearners.length === 0) {
+                learnerSel.innerHTML = `<option value="" disabled selected>-- No Qualified Learners Available --</option>`;
+                restrictionNote.innerText = "⚠️ Restriction Active: No learners have passed all 3 qualification gates yet!";
+                restrictionNote.classList.remove('hidden');
+            } else {
+                learnerSel.innerHTML = `<option value="" disabled selected>-- Select Qualified Learner --</option>`;
+                qualifiedLearners.forEach(l => {
+                    learnerSel.innerHTML += `<option value="${l.name}">${l.name} (${l.id}) - Qualified</option>`;
+                });
+                restrictionNote.classList.add('hidden');
+            }
 
             assetSel.innerHTML = '';
             dataTab2.forEach(a => {
@@ -794,9 +811,18 @@
 
         function handleAddLoan(e) {
             e.preventDefault();
+            const learnerName = document.getElementById('form-loan-learner').value;
+            
+            // Double-Check Validation Gate: Prevent bypassing via direct DOM manipulation
+            const learnerRecord = dataTab1.find(l => l.name === learnerName);
+            if (!learnerRecord || learnerRecord.test !== "Yes" || learnerRecord.agreement !== "Yes" || learnerRecord.storage !== "Yes") {
+                showToast(`Restriction Error: ${learnerName} is not fully qualified (Pending Gates)!`, true);
+                return;
+            }
+
             const newObj = {
                 txn: document.getElementById('form-loan-txn').value.trim(),
-                learner: document.getElementById('form-loan-learner').value,
+                learner: learnerName,
                 asset: document.getElementById('form-loan-asset').value,
                 dateHired: document.getElementById('form-loan-hired').value,
                 home: document.getElementById('form-loan-home').value,
@@ -808,7 +834,7 @@
             renderTab3();
             renderTab2();
             closeModal('modal-add-loan');
-            showToast(`Loan ${newObj.txn} logged successfully.`);
+            showToast(`Loan ${newObj.txn} logged successfully for ${learnerName}.`);
             e.target.reset();
         }
 
