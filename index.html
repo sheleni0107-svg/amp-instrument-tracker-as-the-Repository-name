@@ -317,8 +317,8 @@
             <h3 class="text-base font-bold text-slate-900">Add New Learner</h3>
             <form onsubmit="handleAddLearner(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold mb-1">Learner ID</label>
-                    <input id="form-learner-id" required type="text" placeholder="e.g. L006" class="w-full border rounded-lg p-2 bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500">
+                    <label class="block font-semibold mb-1">Learner ID (Auto-Generated)</label>
+                    <input id="form-learner-id" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed">
                 </div>
                 <div>
                     <label class="block font-semibold mb-1">Full Name</label>
@@ -414,8 +414,8 @@
             <h3 class="text-base font-bold text-slate-900">Log New Loan Transaction</h3>
             <form onsubmit="handleAddLoan(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold mb-1">Transaction ID</label>
-                    <input id="form-loan-txn" required type="text" placeholder="TXN-101" class="w-full border rounded-lg p-2 bg-slate-50">
+                    <label class="block font-semibold mb-1">Transaction ID (Auto-Generated)</label>
+                    <input id="form-loan-txn" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed">
                 </div>
                 <div>
                     <label class="block font-semibold mb-1">Learner Name (Qualified Only)</label>
@@ -565,8 +565,41 @@
             if (tabNum === 4) updateDashboard();
         }
 
+        // AUTO-INCREMENT ID GENERATOR HELPERS
+        function getNextLearnerId() {
+            if (!dataTab1 || dataTab1.length === 0) return "L001";
+            let maxNum = 0;
+            dataTab1.forEach(l => {
+                const match = l.id.match(/\d+/);
+                if (match) {
+                    const num = parseInt(match[0], 10);
+                    if (num > maxNum) maxNum = num;
+                }
+            });
+            return "L" + String(maxNum + 1).padStart(3, '0');
+        }
+
+        function getNextTxnId() {
+            if (!dataTab3 || dataTab3.length === 0) return "TXN-101";
+            let maxNum = 100;
+            dataTab3.forEach(t => {
+                const match = t.txn.match(/\d+/);
+                if (match) {
+                    const num = parseInt(match[0], 10);
+                    if (num > maxNum) maxNum = num;
+                }
+            });
+            return "TXN-" + (maxNum + 1);
+        }
+
         function openModal(id) {
-            if (id === 'modal-add-loan') populateLoanDropdowns();
+            if (id === 'modal-add-learner') {
+                document.getElementById('form-learner-id').value = getNextLearnerId();
+            }
+            if (id === 'modal-add-loan') {
+                document.getElementById('form-loan-txn').value = getNextTxnId();
+                populateLoanDropdowns();
+            }
             document.getElementById(id).classList.remove('hidden');
         }
 
@@ -755,7 +788,7 @@
             saveData();
             renderTab1();
             closeModal('modal-add-learner');
-            showToast(`Learner ${newObj.name} added successfully.`);
+            showToast(`Learner ${newObj.name} added successfully with ID ${newObj.id}.`);
             e.target.reset();
         }
 
