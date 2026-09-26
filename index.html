@@ -201,7 +201,7 @@
 
     </main>
 
-    <!-- Modals (Learner, Inventory, Loan, Maintenance) -->
+    <!-- Modals -->
     <!-- Learner Modal -->
     <div id="learner-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
@@ -214,28 +214,28 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Target Instrument Category</label>
-                    <input type="text" id="l-category" required placeholder="e.g. Acoustic Guitar, Keyboard" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="text" id="l-category" required placeholder="e.g. Acoustic Guitar, Trumpet" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block text-[10px] font-semibold uppercase text-slate-600 mb-1">Knowledge Test</label>
                         <select id="l-knowledge" class="w-full border border-slate-300 rounded-lg p-2 text-xs">
-                            <option value="Pass">Pass</option>
-                            <option value="Fail">Fail</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-semibold uppercase text-slate-600 mb-1">Agreement</label>
                         <select id="l-agreement" class="w-full border border-slate-300 rounded-lg p-2 text-xs">
-                            <option value="true">Signed</option>
-                            <option value="false">Not Signed</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-semibold uppercase text-slate-600 mb-1">Safe Storage</label>
                         <select id="l-storage" class="w-full border border-slate-300 rounded-lg p-2 text-xs">
-                            <option value="Verified">Verified</option>
-                            <option value="Unverified">Unverified</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Type Category</label>
-                        <input type="text" id="i-type" required placeholder="String / Keys" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                        <input type="text" id="i-type" required placeholder="String / Brass" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Condition</label>
@@ -321,7 +321,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Issue Reported</label>
-                    <input type="text" id="m-issue" required placeholder="e.g. Broken tuning peg, cracked bridge" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                    <input type="text" id="m-issue" required placeholder="e.g. Valve stuck, slide jammed" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -334,7 +334,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Technician / Cost</label>
-                        <input type="text" id="m-cost" required placeholder="e.g. R250 / John Smith" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
+                        <input type="text" id="m-cost" required placeholder="e.g. R250 / Workshop" class="w-full border border-slate-300 rounded-lg p-2 text-sm">
                     </div>
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
@@ -347,17 +347,18 @@
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Data Store backed by LocalStorage with default sample records
         let state = JSON.parse(localStorage.getItem('amp_system_state')) || {
             learners: [
-                { name: 'Sipho Dlamini', category: 'Acoustic Guitar', knowledgeTest: 'Pass', agreementSigned: true, safeStorage: 'Verified' },
-                { name: 'Zola Mkhize', category: 'Keyboard', knowledgeTest: 'Pass', agreementSigned: true, safeStorage: 'Unverified' },
-                { name: 'Buhle Khumalo', category: 'Percussion', knowledgeTest: 'Fail', agreementSigned: false, safeStorage: 'Unverified' }
+                { name: 'Sipho Ndlovu', category: 'Violin', knowledgeTest: 'Yes', agreementSigned: 'Yes', safeStorage: 'Yes' },
+                { name: 'Thandiwe Khumalo', category: 'Alto Saxophone', knowledgeTest: 'Yes', agreementSigned: 'Yes', safeStorage: 'Yes' },
+                { name: 'Buhle Mokoena', category: 'Cello', knowledgeTest: 'Yes', agreementSigned: 'No', safeStorage: 'Yes' },
+                { name: 'Lwandle Dlamini', category: 'Trumpet', knowledgeTest: 'Yes', agreementSigned: 'Yes', safeStorage: 'No' },
+                { name: 'Kamvalethu Botha', category: 'Bass Guitar', knowledgeTest: 'Yes', agreementSigned: 'Yes', safeStorage: 'Yes' }
             ],
             inventory: [
                 { serial: 'AMP-GTR-001', name: 'Yamaha C40 Classical', type: 'String', condition: 'Good', status: 'Available' },
-                { serial: 'AMP-KEY-010', name: 'Casio CT-S200', type: 'Keyboard', condition: 'Excellent', status: 'Available' },
-                { serial: 'AMP-PER-003', name: 'Djembe Drum Standard', type: 'Percussion', condition: 'Fair', status: 'Available' }
+                { serial: 'AMP-TRP-002', name: 'Yamaha YTR-2330 Trumpet', type: 'Brass', condition: 'Excellent', status: 'Available' },
+                { serial: 'AMP-BG5-003', name: 'Washburne 5-string Bass', type: 'String', condition: 'Good', status: 'Available' }
             ],
             loans: [],
             returns: [],
@@ -376,34 +377,33 @@
                 el.classList.add('border-transparent', 'text-slate-500');
             });
             document.getElementById(tabId).classList.add('active');
-            const activeBtn = document.getElementById('btn-'- + tabId) || document.getElementById(`btn-${tabId}`);
+            const activeBtn = document.getElementById(`btn-${tabId}`);
             if(activeBtn) {
                 activeBtn.classList.add('border-blue-600', 'text-blue-600');
                 activeBtn.classList.remove('border-transparent', 'text-slate-500');
             }
         }
 
-        // Gate Evaluator Core Function
+        // Updated Gate Evaluator handling Yes/No inputs accurately
         function evaluateLearnerStatus(learner) {
-            const hasKnowledge = learner.knowledgeTest === 'Pass';
-            const hasAgreement = learner.agreementSigned === true;
-            const hasStorage = learner.safeStorage === 'Verified';
+            const hasKnowledge = learner.knowledgeTest === 'Yes' || learner.knowledgeTest === 'Pass';
+            const hasAgreement = learner.agreementSigned === true || learner.agreementSigned === 'Yes';
+            const hasStorage = learner.safeStorage === 'Yes' || learner.safeStorage === 'Verified';
 
-            // Must pass foundational gates to use instruments at all
+            // Must pass foundational gates (Knowledge + Agreement) to use instruments at all
             if (!hasKnowledge || !hasAgreement) {
-                return { status: 'Disqualified', type: 'bg-red-100 text-red-800', allowTakeHome: false, premisesOnly: false };
+                return { status: 'Disqualified', type: 'bg-red-100 text-red-800', premisesOnly: false };
             }
 
-            // Passed knowledge and agreement, but lack safe storage -> Restricted to On-Premises Use
+            // Passed knowledge and agreement, but lack safe storage -> On-Premises Only
             if (!hasStorage) {
-                return { status: 'On-Premises Only', type: 'bg-amber-100 text-amber-800', allowTakeHome: false, premisesOnly: true };
+                return { status: 'On-Premises Only', type: 'bg-amber-100 text-amber-800', premisesOnly: true };
             }
 
-            // Fully qualified for take-home loan
-            return { status: 'Fully Qualified', type: 'bg-emerald-100 text-emerald-800', allowTakeHome: true, premisesOnly: false };
+            // Fully qualified for take-home loans
+            return { status: 'Qualified', type: 'bg-emerald-100 text-emerald-800', premisesOnly: false };
         }
 
-        // Render Worksheets
         function renderAll() {
             renderLearners();
             renderInventory();
@@ -419,11 +419,11 @@
                 const evalRes = evaluateLearnerStatus(l);
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-medium text-slate-900">${l.name}</td>
+                        <td class="p-3 font-medium text-slate-900">L00${idx + 1}<br><span class="text-xs font-normal text-slate-500">${l.name}</span></td>
                         <td class="p-3 text-slate-600">${l.category}</td>
-                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${l.knowledgeTest === 'Pass' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${l.knowledgeTest}</span></td>
-                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${l.agreementSigned ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${l.agreementSigned ? 'Signed' : 'Pending'}</span></td>
-                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${l.safeStorage === 'Verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${l.safeStorage}</span></td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${l.knowledgeTest === 'Yes' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${l.knowledgeTest}</span></td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${l.agreementSigned === 'Yes' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${l.agreementSigned}</span></td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-xs font-semibold ${l.safeStorage === 'Yes' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">${l.safeStorage}</span></td>
                         <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${evalRes.type}">${evalRes.status}</span></td>
                         <td class="p-3 text-right space-x-2">
                             <button onclick="editLearner(${idx})" class="text-blue-600 hover:text-blue-800 text-xs font-semibold">Edit</button>
@@ -558,7 +558,6 @@
             document.getElementById(modalId).classList.remove('flex');
         }
 
-        // Save Operations
         function saveLearner(e) {
             e.preventDefault();
             const idx = document.getElementById('learner-index').value;
@@ -566,7 +565,7 @@
                 name: document.getElementById('l-name').value,
                 category: document.getElementById('l-category').value,
                 knowledgeTest: document.getElementById('l-knowledge').value,
-                agreementSigned: document.getElementById('l-agreement').value === 'true',
+                agreementSigned: document.getElementById('l-agreement').value,
                 safeStorage: document.getElementById('l-storage').value
             };
 
@@ -585,7 +584,7 @@
             document.getElementById('l-name').value = l.name;
             document.getElementById('l-category').value = l.category;
             document.getElementById('l-knowledge').value = l.knowledgeTest;
-            document.getElementById('l-agreement').value = l.agreementSigned.toString();
+            document.getElementById('l-agreement').value = l.agreementSigned;
             document.getElementById('l-storage').value = l.safeStorage;
             document.getElementById('learner-modal').classList.remove('hidden');
             document.getElementById('learner-modal').classList.add('flex');
@@ -670,7 +669,6 @@
             persist();
         }
 
-        // Instant Multi-Sheet Excel Exporter
         function exportAllWorksheetsExcel() {
             const wb = XLSX.utils.book_new();
             
@@ -692,7 +690,6 @@
             XLSX.writeFile(wb, "AMP_Instrument_Management_System.xlsx");
         }
 
-        // Initial paint
         renderAll();
     </script>
 </body>
