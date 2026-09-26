@@ -317,8 +317,8 @@
             <h3 class="text-base font-bold text-slate-900">Add New Learner</h3>
             <form onsubmit="handleAddLearner(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold mb-1">Learner ID (Auto-Generated)</label>
-                    <input id="form-learner-id" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed">
+                    <label class="block font-semibold mb-1">Learner ID (Auto-Generated & Locked)</label>
+                    <input id="form-learner-id" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed select-none">
                 </div>
                 <div>
                     <label class="block font-semibold mb-1">Full Name</label>
@@ -371,8 +371,8 @@
             <h3 class="text-base font-bold text-slate-900">Register New Instrument Asset</h3>
             <form onsubmit="handleAddAsset(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold mb-1">AMP Asset ID</label>
-                    <input id="form-asset-id" required type="text" placeholder="e.g. AMP-VLN-008" class="w-full border rounded-lg p-2 bg-slate-50">
+                    <label class="block font-semibold mb-1">AMP Asset ID (Auto-Generated & Locked)</label>
+                    <input id="form-asset-id" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed select-none">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -414,8 +414,8 @@
             <h3 class="text-base font-bold text-slate-900">Log New Loan Transaction</h3>
             <form onsubmit="handleAddLoan(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold mb-1">Transaction ID (Auto-Generated)</label>
-                    <input id="form-loan-txn" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed">
+                    <label class="block font-semibold mb-1">Transaction ID (Auto-Generated & Locked)</label>
+                    <input id="form-loan-txn" required type="text" readonly class="w-full border rounded-lg p-2 bg-slate-100 text-slate-600 font-mono font-bold cursor-not-allowed select-none">
                 </div>
                 <div>
                     <label class="block font-semibold mb-1">Learner Name (Qualified Only)</label>
@@ -503,9 +503,9 @@
         ];
 
         const DEFAULT_DATA_TAB3 = [
-            { txn: "TXN-001", learner: "Sipho Ndlovu", asset: "AMP-VLNT-007", dateHired: "2026-02-01", home: "Yes", due: "2026-06-15", actual: "" },
-            { txn: "TXN-002", learner: "Thandiwe Khumalo", asset: "AMP-ASX-011", dateHired: "2026-02-03", home: "Yes", due: "2026-06-15", actual: "" },
-            { txn: "TXN-003", learner: "Kamvalethu Botha", asset: "AMP-BGS-003", dateHired: "2026-01-10", home: "Yes", due: "2026-03-01", actual: "" }
+            { txn: "TXN-101", learner: "Sipho Ndlovu", asset: "AMP-VLNT-007", dateHired: "2026-02-01", home: "Yes", due: "2026-06-15", actual: "" },
+            { txn: "TXN-102", learner: "Thandiwe Khumalo", asset: "AMP-ASX-011", dateHired: "2026-02-03", home: "Yes", due: "2026-06-15", actual: "" },
+            { txn: "TXN-103", learner: "Kamvalethu Botha", asset: "AMP-BGS-003", dateHired: "2026-01-10", home: "Yes", due: "2026-03-01", actual: "" }
         ];
 
         let dataTab1 = [];
@@ -579,6 +579,19 @@
             return "L" + String(maxNum + 1).padStart(3, '0');
         }
 
+        function getNextAssetId() {
+            if (!dataTab2 || dataTab2.length === 0) return "AMP-GEN-001";
+            let maxNum = 0;
+            dataTab2.forEach(a => {
+                const match = a.id.match(/\d+/);
+                if (match) {
+                    const num = parseInt(match[0], 10);
+                    if (num > maxNum) maxNum = num;
+                }
+            });
+            return "AMP-GEN-" + String(maxNum + 1).padStart(3, '0');
+        }
+
         function getNextTxnId() {
             if (!dataTab3 || dataTab3.length === 0) return "TXN-101";
             let maxNum = 100;
@@ -595,6 +608,9 @@
         function openModal(id) {
             if (id === 'modal-add-learner') {
                 document.getElementById('form-learner-id').value = getNextLearnerId();
+            }
+            if (id === 'modal-add-asset') {
+                document.getElementById('form-asset-id').value = getNextAssetId();
             }
             if (id === 'modal-add-loan') {
                 document.getElementById('form-loan-txn').value = getNextTxnId();
@@ -639,7 +655,7 @@
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 border-r font-mono"><input value="${row.id}" onchange="dataTab1[${index}].id=this.value; saveData();" class="w-full bg-transparent"></td>
+                        <td class="p-3 border-r font-mono font-bold text-slate-600 bg-slate-50">${row.id}</td>
                         <td class="p-3 border-r"><input value="${row.name}" onchange="dataTab1[${index}].name=this.value; saveData();" class="w-full font-semibold"></td>
                         <td class="p-3 border-r"><input value="${row.grade}" onchange="dataTab1[${index}].grade=this.value; saveData();" class="w-full"></td>
                         <td class="p-3 border-r"><input value="${row.inst}" onchange="dataTab1[${index}].inst=this.value; saveData();" class="w-full"></td>
@@ -691,7 +707,7 @@
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 border-r font-mono font-bold"><input value="${row.id}" onchange="dataTab2[${index}].id=this.value; saveData(); renderTab3();" class="w-full bg-transparent"></td>
+                        <td class="p-3 border-r font-mono font-bold text-slate-600 bg-slate-50">${row.id}</td>
                         <td class="p-3 border-r"><input value="${row.cat}" onchange="dataTab2[${index}].cat=this.value; saveData();" class="w-full"></td>
                         <td class="p-3 border-r"><input value="${row.type}" onchange="dataTab2[${index}].type=this.value; saveData();" class="w-full"></td>
                         <td class="p-3 border-r"><input value="${row.brand}" onchange="dataTab2[${index}].brand=this.value; saveData();" class="w-full"></td>
@@ -739,7 +755,7 @@
 
                 tbody.innerHTML += `
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 border-r font-mono"><input value="${row.txn}" onchange="dataTab3[${index}].txn=this.value; saveData();" class="w-full bg-transparent"></td>
+                        <td class="p-3 border-r font-mono font-bold text-slate-600 bg-slate-50">${row.txn}</td>
                         <td class="p-3 border-r font-semibold">${row.learner}</td>
                         <td class="p-3 border-r font-mono">${row.asset}</td>
                         <td class="p-3 border-r"><input type="date" value="${row.dateHired}" onchange="dataTab3[${index}].dateHired=this.value; saveData();" class="w-full"></td>
